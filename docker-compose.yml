@@ -1,0 +1,16 @@
+services:
+  kanplan:
+    build: .
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /data
+      DEBUG: "False"
+    restart: unless-stopped

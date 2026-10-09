@@ -1,0 +1,31 @@
+[project]
+name = "kanplan"
+version = "0.1.0"
+description = "Fully local AI Kanban planning tool."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.1,<6.0",
+    "whitenoise",
+    "pillow",
+    "pypdf",
+    "python-docx",
+    "weasyprint",
+    "openai",
+    "python-dotenv",
+    "requests",
+]
+
+[dependency-groups]
+dev = [
+    "django-browser-reload",
+    "pytest",
+    "pytest-django",
+]
+docker = [
+    "gunicorn",
+]
+
+[tool.uv]
+package = false

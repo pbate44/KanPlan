@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{{ card.title }} – Card Report</title>
+  <link rel="stylesheet" href="{% static 'css/shopfront/pdf.css' %}">
+</head>
+<body>
+  <div class="wrap">
+    <h1>{{ card.title }}</h1>
+    <div class="meta">Created: {{ card.created_at|date:"M d, Y" }}</div>
+
+    {% if card.description %}
+      <div class="section-title">Description</div>
+      <div class="description">{{ card.description }}</div>
+    {% endif %}
+
+    <div class="section-title">Log Entries</div>
+    <div class="logs">
+      {% for entry in log_entries %}
+        <div class="log">
+          <div class="log-meta">
+            {{ entry.created_at|date:"M d, Y H:i" }}
+          </div>
+          <div class="log-text">{{ entry.text }}</div>
+        </div>
+      {% empty %}
+        <div class="log">
+          <div class="log-text" style="color:#666;">No log entries available.</div>
+        </div>
+      {% endfor %}
+    </div>
+    <hr>
+    <div>Generated on KanPlan</div>
+  </div>
+</body>
+</html>

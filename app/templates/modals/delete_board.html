@@ -1,0 +1,73 @@
+
+<div
+  class="modal"
+  id="deleteBoardModal"
+  tabindex="-1"
+  aria-labelledby="deleteBoardModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+ 
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteBoardModalLabel">
+          <i class="bi bi-trash" style="color:var(--danger);"></i>Delete Board
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+ 
+      <div class="modal-body">
+        <div class="delete-warning-banner" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div>
+            <strong>This action cannot be undone</strong>
+            <span>All data associated with this board will be permanently removed.</span>
+          </div>
+        </div>
+ 
+        <p class="delete-confirm-text">
+          Are you sure you want to delete <strong id="deleteBoardName"></strong>?
+        </p>
+ 
+        <div class="deletion-info">
+          <h6>This will permanently delete:</h6>
+          <ul>
+            <li>The board and all its settings</li>
+            <li>All columns and swimlanes</li>
+            <li>All cards and their content</li>
+            <li>All card attachments and chat history</li>
+            <li>All log entries and activity history</li>
+          </ul>
+        </div>
+ 
+        <div class="mb-3">
+          <label for="deleteConfirmInput" class="form-label">
+            Type <strong id="confirmBoardName" style="color:var(--text);"></strong> to confirm:
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="deleteConfirmInput"
+            placeholder="Enter board name to confirm deletion"
+          />
+          <div class="form-text">This helps prevent accidental deletions.</div>
+        </div>
+ 
+        <input type="hidden" id="deleteBoardId" name="board_id" />
+      </div>
+ 
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBoard" disabled>
+          <span class="btn-text">
+            <i class="bi bi-trash me-1"></i>Delete Board
+          </span>
+          <span class="btn-loading d-none">
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>Deleting…
+          </span>
+        </button>
+      </div>
+ 
+    </div>
+  </div>
+</div>

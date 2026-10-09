@@ -1,0 +1,62 @@
+
+<div
+  class="modal"
+  id="createBoardModal"
+  tabindex="-1"
+  aria-labelledby="createBoardModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content createboard">
+ 
+      <div class="modal-header">
+        <h5 class="modal-title" id="createBoardModalLabel">
+          <i class="bi bi-plus-circle"></i>Create New Board
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+ 
+      <form id="createBoardForm">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="boardName" class="form-label">Board Name *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="boardName"
+              name="name"
+              placeholder="Enter board name"
+              required
+              maxlength="100"
+            >
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="mb-3">
+            <label for="boardDescription" class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              id="boardDescription"
+              name="description"
+              rows="3"
+              placeholder="Optional board description"
+            ></textarea>
+            <div class="form-text">Briefly describe what this board will be used for.</div>
+          </div>
+        </div>
+ 
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="board-submit btn btn-primary" id="createBoardSubmit">
+            <span class="btn-text">
+              <i class="bi bi-plus-circle me-1"></i>Create Board
+            </span>
+            <span class="btn-loading d-none">
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>Creating…
+            </span>
+          </button>
+        </div>
+      </form>
+ 
+    </div>
+  </div>
+</div>

@@ -1,0 +1,254 @@
+.header-spacer {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  align-items: center;
+  background: var(--bg-3);
+  border: none;
+  width: 2.5rem;
+  border-radius: var(--radius-sm);
+  gap: 0.2rem;
+  flex-direction: row;
+}
+
+.addSwimlaneBtn,
+.addColumnBtn {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  height: 100%;
+  width: 100%;
+  flex: 1;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color .18s, background .18s, border-color .18s;
+  font-size: 0.8rem;
+}
+
+.addColumnBtn {
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+}
+.addSwimlaneBtn {
+  border-radius: var(--radius-xs) 0 0 var(--radius-xs);
+}
+
+.addSwimlaneBtn:hover,
+.addColumnBtn:hover {
+  background-color: rgba(var(--accent-rgb), .1);
+  border-color: rgba(var(--accent-rgb), .3);
+  color: var(--accent);
+}
+
+.column-header {
+  background: var(--bg-3);
+  height: 100%;
+  overflow: visible;
+  grid-template-rows: auto auto;
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+.column-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--col-color, rgba(var(--accent-rgb), .35));
+  opacity: .6;
+}
+
+.column-header-content {
+  display: flex;
+  padding: 0;
+  align-items: center;
+}
+
+.column-name {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-head);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex: 1;
+  line-height: 1.1;
+  cursor: pointer;
+  align-items: center;
+  padding: 0.125rem 0 0.125rem 0.4rem;
+  transition: color .15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.column-name:hover { color: var(--text); }
+
+.column-name-input.form-control {
+  background: var(--bg-3);
+  color: var(--text);
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.column-name-input.form-control:focus {
+  background: var(--bg-3);
+  color: var(--text);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), .12);
+  outline: none;
+}
+
+.column-actions,
+.swimlane-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.column-header .column-actions {
+  opacity: 0;
+  transition: opacity .15s;
+}
+.column-header:hover .column-actions { opacity: 1; }
+
+.column-actions button,
+.swimlane-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.column-actions button i,
+.swimlane-actions button i {
+  font-size: 0.75rem;
+}
+
+.column-actions button:hover,
+.swimlane-actions button:hover,
+.column-actions button:focus-visible,
+.swimlane-actions button:focus-visible {
+  background: rgba(var(--ink-rgb), .06);
+  border-color: rgba(var(--ink-rgb), .1);
+  color: var(--text);
+  outline: none;
+}
+
+.addCardButton {
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addCardButton i { font-size: 0.75rem; }
+
+.delete-column-btn:hover,
+.delete-swimlane-btn:hover,
+.delete-column-btn:focus-visible {
+  background: rgba(var(--danger-rgb), .1) !important;
+  border-color: var(--danger-border) !important;
+  color: var(--danger) !important;
+}
+
+.swimlane-header {
+  background: var(--bg-3);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  grid-column: 1;
+  border: none;
+  width: 2.5rem;
+  position: relative;
+}
+
+.swimlane-header::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 2px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--accent-rgb), .3);
+}
+
+.swimlane-name {
+  font-weight: 700;
+  font-family: var(--font-head);
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 0.5rem 0.2rem;
+  cursor: pointer;
+  transition: color .15s;
+  transform: rotate(180deg);
+  writing-mode: vertical-rl;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  text-align: center;
+}
+
+.swimlane-name:hover { color: var(--text); }
+
+.swimlane-name-input {
+  text-align: center;
+  writing-mode: vertical-rl;
+}
+
+.swimlane-name-input.form-control {
+  background: var(--bg-3);
+  color: var(--text);
+  max-width: fit-content;
+  margin: auto;
+  border: 1px solid rgba(var(--accent-rgb), .3);
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.swimlane-name-input.form-control:focus {
+  background: var(--bg-3);
+  color: var(--text);
+  max-width: fit-content;
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), .12);
+  outline: none;
+}
+
+.swimlane-header .swimlane-actions {
+  opacity: 0;
+  transition: opacity .15s;
+  display: flex;
+  gap: 0.2rem;
+}
+.swimlane-header:hover .swimlane-actions { opacity: 1; }

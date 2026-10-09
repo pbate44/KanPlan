@@ -1,0 +1,62 @@
+
+<div
+  class="modal"
+  id="editBoardModal"
+  tabindex="-1"
+  aria-labelledby="editBoardModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content editboard">
+ 
+      <div class="modal-header">
+        <h5 class="modal-title" id="editBoardModalLabel">
+          <i class="bi bi-pencil"></i>Edit Board
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+ 
+      <form id="editBoardForm">
+        <div class="modal-body">
+          <input type="hidden" id="editBoardId" name="board_id" />
+          <div class="mb-3">
+            <label for="editBoardName" class="form-label">Board Name *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="editBoardName"
+              name="name"
+              placeholder="Enter board name"
+              required
+              maxlength="100"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+          <div class="mb-3">
+            <label for="editBoardDescription" class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              id="editBoardDescription"
+              name="description"
+              rows="3"
+              placeholder="Optional board description"
+            ></textarea>
+          </div>
+        </div>
+ 
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="save-changes btn btn-primary" id="editBoardSubmit">
+            <span class="btn-text">
+              <i class="bi bi-check-circle me-1"></i>Save Changes
+            </span>
+            <span class="btn-loading d-none">
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving…
+            </span>
+          </button>
+        </div>
+      </form>
+ 
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+# Keep start scripts runnable on their platforms regardless of git autocrlf.
+*.sh  text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf

@@ -1,0 +1,173 @@
+/* Board assistant panel. Shares the card assistant's .ai-chat-* styles (cardmodal.css). */
+
+:root { --board-ai-width: 420px; --board-ai-top: 60px; }
+
+.nav-dashboard-btn.board-ai-toggle {
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+.board-ai-toggle[aria-expanded="true"] {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), .08);
+  border-color: var(--border-hi);
+}
+
+/* Sits under the nav so the board stays usable beside it. */
+.ai-chat-panel.board-ai-panel {
+  top: var(--board-ai-top);
+  height: calc(100vh - var(--board-ai-top));
+  width: var(--board-ai-width);
+  right: calc(-1 * var(--board-ai-width) - 20px);
+  box-shadow: -8px 0 24px rgba(0,0,0,.18);
+  visibility: hidden;
+  transition: right .3s cubic-bezier(.4,0,.2,1), visibility 0s linear .3s;
+}
+.ai-chat-panel.board-ai-panel.open {
+  top: var(--board-ai-top);
+  height: calc(100vh - var(--board-ai-top));
+  width: var(--board-ai-width);
+  right: 0;
+  overflow: hidden;
+  visibility: visible;
+  transition: right .3s cubic-bezier(.4,0,.2,1);
+}
+
+body.board-ai-open .board-wrapper {
+  width: calc(100% - var(--board-ai-width));
+  transition: width .3s cubic-bezier(.4,0,.2,1);
+}
+
+.board-ai-header-btn,
+.board-ai-back {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: .75rem;
+  font-family: var(--font-body);
+  padding: .3rem .55rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  transition: border-color .15s, color .15s;
+}
+.board-ai-back { background: transparent; font-size: .72rem; padding: .25rem .55rem; }
+.board-ai-header-btn:hover,
+.board-ai-back:hover { border-color: rgba(var(--ink-rgb), .2); color: var(--text); }
+#board-ai-new:hover { border-color: var(--border-hi); color: var(--accent); }
+#board-ai-new:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+
+.board-ai-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .9rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color .15s, color .15s, background .15s, box-shadow .15s;
+}
+.board-ai-icon-btn:hover { border-color: var(--border-hi); color: var(--accent); }
+.board-ai-icon-btn--active {
+  background: rgba(var(--accent-rgb), .12);
+  border-color: var(--border-hi);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .1);
+}
+
+.board-ai-submit {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  border: none;
+  color: var(--on-gradient);
+  font-size: .9rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.board-ai-submit:hover:not(:disabled) { background: var(--accent-hover); }
+.board-ai-submit:disabled { opacity: .35; cursor: not-allowed; }
+
+.board-ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: 1.5rem;
+  color: var(--faint);
+  font-size: .82rem;
+}
+
+/* A change the assistant made, or a delete waiting for confirmation. */
+.board-ai-action {
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .25rem .5rem;
+  padding: .45rem .7rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: .8rem;
+  color: var(--text);
+  line-height: 1.45;
+}
+.board-ai-action > .bi { color: var(--accent); flex-shrink: 0; }
+.board-ai-action__text { flex: 1; min-width: 0; word-break: break-word; }
+
+.board-ai-action--delete_request,
+.board-ai-action--delete_done { border-left-color: var(--danger); }
+.board-ai-action--delete_request > .bi,
+.board-ai-action--delete_done > .bi { color: var(--danger); }
+.board-ai-action--delete_cancelled { border-left-color: var(--faint); color: var(--muted); }
+.board-ai-action--delete_cancelled > .bi { color: var(--faint); }
+
+.board-ai-action__footer {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: .4rem;
+  padding-top: .25rem;
+}
+.board-ai-action__btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: .76rem;
+  font-family: var(--font-body);
+  padding: .25rem .65rem;
+  cursor: pointer;
+}
+.board-ai-action__btn:hover:not(:disabled) { border-color: rgba(var(--ink-rgb), .25); }
+.board-ai-action__btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.board-ai-action__btn--danger:hover:not(:disabled) { filter: brightness(1.08); }
+.board-ai-action__btn:disabled { opacity: .5; cursor: not-allowed; }
+.board-ai-action__status {
+  font-size: .72rem;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+@media (max-width: 640px) {
+  :root { --board-ai-width: 100vw; }
+  body.board-ai-open .board-wrapper { width: 100%; }
+  /* Room for the extra nav button. */
+  .nav__buttons-section { gap: .35rem; }
+}

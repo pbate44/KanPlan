@@ -1,0 +1,75 @@
+
+<div
+  class="modal"
+  id="uploadImageModal"
+  tabindex="-1"
+  aria-labelledby="uploadImageModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+ 
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadImageModalLabel">
+          <i class="bi bi-image"></i>Upload Board Image
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+ 
+      <form id="uploadImageForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" id="uploadBoardId" name="board_id" />
+
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-content">
+              <i class="bi bi-cloud-upload upload-icon"></i>
+              <h6>Drop your image here or click to browse</h6>
+              <p>Supports JPEG, PNG, GIF, WebP &nbsp;·&nbsp; Max 5 MB</p>
+            </div>
+            <input type="file" id="imageFile" name="image" accept="image/*" class="d-none" />
+          </div>
+
+          <div class="image-preview d-none" id="imagePreview">
+            <div class="preview-container">
+              <img src="" alt="Preview" id="previewImage" class="img-fluid rounded" />
+              <button type="button" class="btn btn-sm btn-danger preview-remove" id="removePreview">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+            <div class="preview-info mt-2">
+              <span id="fileName"></span> · <span id="fileSize"></span>
+            </div>
+          </div>
+
+          <div class="upload-progress d-none" id="uploadProgress">
+            <div class="progress mb-2">
+              <div class="progress-bar" role="progressbar" style="width:0%"></div>
+            </div>
+            <small class="form-text">Uploading image…</small>
+          </div>
+          <div class="upload-guidelines">
+            <h6><i class="bi bi-info-circle"></i>Image Guidelines</h6>
+            <ul>
+              <li>Use high-quality images for best results</li>
+              <li>Recommended size: 400 × 300 px or larger</li>
+              <li>Images will be automatically resized to fit the board tile</li>
+            </ul>
+          </div>
+        </div>
+ 
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="uploadImageSubmit" disabled>
+            <span class="btn-text">
+              <i class="bi bi-upload me-1"></i>Upload Image
+            </span>
+            <span class="btn-loading d-none">
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>Uploading…
+            </span>
+          </button>
+        </div>
+      </form>
+ 
+    </div>
+  </div>
+</div>

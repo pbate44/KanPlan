@@ -1,0 +1,154 @@
+/*
+  Design tokens — the single source of truth for colours, type, radii and shadows.
+  Component CSS should only reference these variables, never raw values.
+
+  Values follow the Atlassian Design System (neutral greys, blue brand, tight radii,
+  soft layered shadows). Dark is the default (:root); light overrides live under
+  :root[data-theme="light"]. data-theme is always resolved to "light" or "dark" by
+  the inline script in base.html, so there is no separate "system" block.
+
+  The *-rgb channels exist so tints can be written as rgba(var(--accent-rgb), .1).
+  --ink-rgb is the foreground overlay colour (pale blue-grey on dark, navy on light).
+  Use it for subtle hover fills and stronger borders.
+*/
+
+:root {
+  color-scheme: dark;
+
+  --bg:             #1d2125;
+  --bg-2:           #22272b;
+  --bg-3:           #282e33;
+  --surface:        rgba(161,189,217,.06);
+  --nav-bg:         #1d2125;
+  --backdrop:       rgba(16,18,20,.6);
+
+  --border:         rgba(166,197,226,.16);
+  --border-hi:      #85b8ff;
+
+  --text:           #b6c2cf;
+  --text-strong:    #dee4ea;
+  --muted:          #9fadbc;
+  --faint:          #8c9bab;
+  --ink-rgb:        161, 189, 217;
+
+  /* Brand — accent-2 matches accent so legacy gradients render flat */
+  --accent:         #579dff;
+  --accent-rgb:     87, 157, 255;
+  --accent-hover:   #85b8ff;
+  --accent-2:       #579dff;
+  --accent-2-rgb:   87, 157, 255;
+  --on-accent:      #1d2125;
+  --on-gradient:    #1d2125;
+
+  --danger:         #f87168;
+  --danger-rgb:     248, 113, 104;
+  --danger-bg:      rgba(248,113,104,.1);
+  --danger-border:  rgba(248,113,104,.4);
+  --success:        #4bce97;
+  --success-rgb:    75, 206, 151;
+  --warning:        #f5cd47;
+  --warning-rgb:    245, 205, 71;
+
+  /* Solid priority badges (card modal header) */
+  --priority-low:    #1f845a;
+  --priority-medium: #e2b203;
+  --priority-high:   #c9372c;
+
+  --font-head:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:      ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-xs:      2px;
+  --radius-sm:      3px;
+  --radius-md:      4px;
+  --radius-lg:      4px;
+  --radius-xl:      6px;
+  --radius-2xl:     8px;
+  --radius-pill:    999px;
+
+  --shadow-card-hover: 0 1px 1px rgba(3,4,4,.5), 0 0 1px rgba(3,4,4,.5);
+  --shadow-menu:       inset 0 0 0 1px rgba(188,214,240,.04), 0 8px 12px rgba(3,4,4,.36), 0 0 1px rgba(3,4,4,.5);
+  --shadow-popover:    inset 0 0 0 1px rgba(188,214,240,.04), 0 8px 12px rgba(3,4,4,.36), 0 0 1px rgba(3,4,4,.5);
+  --shadow-modal:      inset 0 0 0 1px rgba(188,214,240,.04), 0 20px 32px -8px rgba(3,4,4,.5), 0 0 1px rgba(3,4,4,.5);
+
+  /* Bootstrap close button glyph is black; invert it on dark surfaces */
+  --close-filter:   invert(1) brightness(.8);
+
+  --bs-primary:     var(--accent);
+  --bs-primary-rgb: var(--accent-rgb);
+  --bs-body-font-family: var(--font-body);
+
+  /* Card colour palette (card backgrounds; text uses --text) */
+  --card-tint-opacity:          1;
+  --card-color-default-rgb:     44, 51, 58;
+  --card-color-red-rgb:         93, 31, 26;
+  --card-color-orange-rgb:      112, 46, 0;
+  --card-color-yellow-rgb:      83, 63, 4;
+  --card-color-light-green-rgb: 55, 71, 31;
+  --card-color-dark-green-rgb:  22, 75, 53;
+  --card-color-teal-rgb:        22, 69, 85;
+  --card-color-cyan-rgb:        29, 71, 76;
+  --card-color-blue-rgb:        9, 50, 108;
+  --card-color-purple-rgb:      53, 44, 99;
+  --card-color-magenta-rgb:     80, 37, 63;
+  --card-color-pink-rgb:        92, 36, 66;
+  --card-color-dark-rgb:        22, 26, 29;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg:             #f7f8f9;
+  --bg-2:           #ffffff;
+  --bg-3:           #f1f2f4;
+  --surface:        rgba(9,30,66,.04);
+  --nav-bg:         #ffffff;
+  --backdrop:       rgba(9,30,66,.5);
+
+  --border:         rgba(9,30,66,.14);
+  --border-hi:      #388bff;
+
+  --text:           #172b4d;
+  --text-strong:    #091e42;
+  --muted:          #44546f;
+  --faint:          #626f86;
+  --ink-rgb:        9, 30, 66;
+
+  --accent:         #0c66e4;
+  --accent-rgb:     12, 102, 228;
+  --accent-hover:   #0055cc;
+  --accent-2:       #0c66e4;
+  --accent-2-rgb:   12, 102, 228;
+  --on-accent:      #ffffff;
+  --on-gradient:    #ffffff;
+
+  --danger:         #c9372c;
+  --danger-rgb:     201, 55, 44;
+  --danger-bg:      rgba(201,55,44,.08);
+  --danger-border:  rgba(201,55,44,.35);
+  --success:        #1f845a;
+  --success-rgb:    31, 132, 90;
+  --warning:        #a54800;
+  --warning-rgb:    226, 178, 3;
+
+  --shadow-card-hover: 0 1px 1px rgba(9,30,66,.25), 0 0 1px rgba(9,30,66,.31);
+  --shadow-menu:       0 8px 12px rgba(9,30,66,.15), 0 0 1px rgba(9,30,66,.31);
+  --shadow-popover:    0 8px 12px rgba(9,30,66,.15), 0 0 1px rgba(9,30,66,.31);
+  --shadow-modal:      0 20px 32px -8px rgba(9,30,66,.25), 0 0 1px rgba(9,30,66,.31);
+
+  --close-filter:   none;
+
+  --card-color-default-rgb:     241, 242, 244;
+  --card-color-red-rgb:         255, 213, 210;
+  --card-color-orange-rgb:      254, 222, 200;
+  --card-color-yellow-rgb:      248, 230, 160;
+  --card-color-light-green-rgb: 211, 241, 167;
+  --card-color-dark-green-rgb:  186, 243, 219;
+  --card-color-teal-rgb:        198, 237, 251;
+  --card-color-cyan-rgb:        193, 240, 245;
+  --card-color-blue-rgb:        204, 224, 255;
+  --card-color-purple-rgb:      223, 216, 253;
+  --card-color-magenta-rgb:     253, 208, 236;
+  --card-color-pink-rgb:        255, 214, 232;
+  --card-color-dark-rgb:        179, 185, 196;
+}

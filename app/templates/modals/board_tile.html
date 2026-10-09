@@ -1,0 +1,96 @@
+<div
+  class="board-tile"
+  data-board-id="{{ board.id }}"
+  data-created="{{ board.created_at|date:'c' }}"
+  data-updated="{{ board.updated_at|date:'c' }}"
+>
+  <div class="board-tile-content">
+
+    <div class="board-image-container">
+      {% if board.image %}
+        <img
+          src="{{ board.image.url }}"
+          alt="{{ board.name }}"
+          class="board-image"
+        />
+      {% else %}
+        <div class="board-image-placeholder">
+          <i class="bi bi-kanban"></i>
+        </div>
+      {% endif %}
+      <div class="board-image-overlay"></div>
+    </div>
+ 
+    <div class="board-info">
+      <h3 class="board-title">{{ board.name }}</h3>
+      {% if board.description %}
+        <p class="board-description">{{ board.description|truncatechars:100 }}</p>
+      {% endif %}
+      <div class="board-meta">
+        <i class="bi bi-clock"></i>
+        Edited {{ board.updated_at|timesince }} ago
+      </div>
+    </div>
+
+    <div class="board-actions">
+      <div class="dashboard-dropdown dropdown">
+        <button
+          class="btn btn-sm btn-outline-light board-menu-btn"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="bi bi-three-dots"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end dashboard-edit">
+          <li>
+            <a
+              class="dropdown-item edit-board-btn"
+              href="#"
+              data-board-id="{{ board.id }}"
+              data-board-name="{{ board.name }}"
+              data-board-description="{{ board.description }}"
+            >
+              <i class="bi bi-pencil"></i>Edit Board
+            </a>
+          </li>
+          <li>
+            <a
+              class="dropdown-item upload-image-btn"
+              href="#"
+              data-board-id="{{ board.id }}"
+            >
+              <i class="bi bi-image"></i>Change Image
+            </a>
+          </li>
+          {% if board.image %}
+          <li>
+            <a
+              class="dropdown-item remove-image-btn"
+              href="#"
+              data-board-id="{{ board.id }}"
+            >
+              <i class="bi bi-image-alt"></i>Remove Image
+            </a>
+          </li>
+          {% endif %}
+          <li>
+            <a
+              class="dropdown-item text-danger delete-board-btn"
+              href="#"
+              data-board-id="{{ board.id }}"
+              data-board-name="{{ board.name }}"
+            >
+              <i class="bi bi-trash"></i>Delete Board
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    {% if board.id %}
+      <a href="{% url 'board_detail' board.id %}" class="board-click-overlay" aria-label="Open {{ board.name }}"></a>
+    {% endif %}
+ 
+  </div>
+</div>

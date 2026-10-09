@@ -1,0 +1,37 @@
+# ── Python ────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+
+# ── Virtual environments ──────────────────────
+.venv/
+venv/
+env/
+
+# ── Django ────────────────────────────────────
+*.sqlite3
+.secret_key
+staticfiles/
+media/
+data/
+.DS_Store
+
+# ── Environment variables ─────────────────────
+.env
+.env.*
+!.env.example
+
+# ── macOS ─────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Logs ──────────────────────────────────────
+*.log
+
+# ── Claude ────────────────────────────────────
+CLAUDE.md
+
+# ── Editor ────────────────────────────────────
+.vscode/

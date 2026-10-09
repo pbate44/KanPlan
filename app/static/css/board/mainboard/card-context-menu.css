@@ -1,0 +1,153 @@
+#cardContextMenu,
+#cellContextMenu {
+  position: fixed;
+  z-index: 9999;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-menu);
+  padding: 4px 0;
+  min-width: 180px;
+  display: none;
+  user-select: none;
+}
+
+.ctx-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text);
+  transition: background 0.12s ease;
+  white-space: nowrap;
+}
+
+.ctx-menu__item:hover,
+.ctx-menu__item:focus-visible {
+  background: rgba(var(--ink-rgb), .08);
+  color: var(--text-strong);
+  outline: none;
+}
+
+.ctx-menu__item i {
+  font-size: 0.9rem;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ctx-menu__divider {
+  height: 1px;
+  background: rgba(var(--ink-rgb), .08);
+  margin: 4px 0;
+}
+
+.ctx-menu__item--danger {
+  color: var(--danger);
+}
+
+.ctx-menu__item--danger:hover {
+  background: rgba(var(--danger-rgb), .15);
+  color: var(--danger);
+}
+
+.qmodal .modal-dialog {
+  max-width: 400px;
+}
+
+#ctxColorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+#ctxColorGrid .card-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  flex-shrink: 0;
+}
+
+#ctxColorGrid .card-color-swatch:hover {
+  transform: scale(1.15);
+}
+
+#ctxColorGrid .card-color-swatch.selected {
+  border-color: var(--text-strong);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+#ctxPriorityGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ctx-priority-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 2px solid rgba(var(--ink-rgb), .12);
+  background: rgba(var(--ink-rgb), .06);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease, background 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ctx-priority-btn:hover {
+  background: rgba(var(--ink-rgb), .12);
+  color: var(--text-strong);
+  transform: scale(1.1);
+}
+
+.ctx-priority-btn.active {
+  border-color: var(--text-strong);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+#addCardColorGrid {
+  background-color: var(--bg-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+#addCardColorGrid .card-color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  flex-shrink: 0;
+}
+
+#addCardColorGrid .card-color-swatch:hover {
+  transform: scale(1.15);
+}
+
+#addCardColorGrid .card-color-swatch.selected {
+  border-color: var(--text-strong);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+#addCardPriorityGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

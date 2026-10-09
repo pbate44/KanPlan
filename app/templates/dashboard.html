@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Dashboard{% endblock %}
+
+{% block additional_styles %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/board-tile.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/modals.css' %}">
+<link rel="modulepreload" href="{% static 'js/dashboard/dash_init.js' %}">
+<link rel="modulepreload" href="{% static 'js/dashboard/dash_utils.js' %}">
+<link rel="modulepreload" href="{% static 'js/dashboard/dash_searchfilt.js' %}">
+{% endblock %}
+
+{% block content %}
+
+<div id="dashboardLoader" class="dashboard-loader">
+<div class="loader-content">
+    <div class="loader-spinner"></div>
+    <h3 class="loader-title">Loading Dashboard</h3>
+    <p class="loader-subtitle">Preparing your boards…</p>
+</div>
+</div>
+
+<div class="container-fluid dashboard-container"
+    data-max-boards="{{ max_boards }}"
+    data-board-count="{{ board_count }}">
+
+<div class="dashboard-header">
+    <div>
+    <h1 class="dashboard-title">My Boards</h1>
+    <p class="dashboard-under">Manage your project boards</p>
+    </div>
+    <button type="button" id="createBoardBtn">
+    <i class="bi bi-plus-circle"></i>
+    New Board
+    </button>
+</div>
+
+<div class="dashboard-controls">
+    <div class="row">
+    <div class="col-md-6">
+        <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+            type="text"
+            class="dashboard-search form-control"
+            id="boardSearch"
+            placeholder="Search boards…"
+        >
+        </div>
+    </div>
+    <div class="col-md-6 text-end">
+        <div class="btn-group" role="group">
+        <input type="radio" class="btn-check" name="sortBy" id="sortByUpdated" value="updated" checked>
+        <label class="btn btn-outline-secondary sortByUpdated" for="sortByUpdated">Recently Updated</label>
+
+        <input type="radio" class="btn-check" name="sortBy" id="sortByName" value="name">
+        <label class="btn btn-outline-secondary sortByName" for="sortByName">Name</label>
+
+        <input type="radio" class="btn-check" name="sortBy" id="sortByCreated" value="created">
+        <label class="btn btn-outline-secondary sortByCreated" for="sortByCreated">Recently Created</label>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="boards-grid" id="boardsGrid">
+    {% for board in boards %}
+    {% include 'modals/board_tile.html' with board=board %}
+    {% empty %}
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-kanban" aria-hidden="true"></i></div>
+        <h3>No boards yet</h3>
+        <p>Create your first board to get started with KanPlan</p>
+        <button type="button" class="create-first-board" id="createFirstBoardBtn">
+        <i class="bi bi-plus-circle"></i>Create Your First Board
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+</div>
+
+{% include 'modals/create_board.html' %}
+{% include 'modals/edit_board.html' %}
+{% include 'modals/upload_image.html' %}
+{% include 'modals/delete_board.html' %}
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="module" src="{% static 'js/dashboard/dash_init.js' %}"></script>
+{% endblock %}

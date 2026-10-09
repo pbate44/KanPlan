@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Docs - KanPlan{% endblock %}
+
+{% block additional_styles %}
+<link rel="stylesheet" href="{% static 'css/docs.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="docs-layout">
+
+  <aside class="docs__sidebar" aria-label="Table of contents">
+    <div class="docs__sidebar-label">Contents</div>
+    <nav class="docs__toc">
+      <a href="#boards"><span class="docs__toc-num">01</span> Boards</a>
+      <a href="#columns"><span class="docs__toc-num">02</span> Columns</a>
+      <a href="#cards"><span class="docs__toc-num">03</span> Cards</a>
+      <a href="#ai-chat"><span class="docs__toc-num">04</span> AI Chat</a>
+      <a href="#swimlanes"><span class="docs__toc-num">05</span> Swimlanes</a>
+      <a href="#attachments"><span class="docs__toc-num">06</span> Attachments</a>
+      <a href="#settings"><span class="docs__toc-num">07</span> Settings &amp; AI</a>
+    </nav>
+  </aside>
+
+  <main class="docs__main">
+
+    <header class="docs__header">
+      <div class="docs__eyebrow">Documentation</div>
+      <h1 class="docs__title">How KanPlan works</h1>
+      <p class="docs__subtitle">Everything you need to get the most out of the app.</p>
+    </header>
+
+    <section class="docs__section" id="boards">
+      <div class="docs__section-label">01</div>
+      <h2>Boards</h2>
+      <p>Boards are your top-level workspaces. Create one per project, team, or area of focus. Each board has its own columns, cards, and swimlanes.</p>
+      <ul>
+        <li>Create a board from the Dashboard.</li>
+        <li>Give it a name and an optional cover image.</li>
+        <li>Switch between boards via the Dashboard at any time.</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="columns">
+      <div class="docs__section-label">02</div>
+      <h2>Columns</h2>
+      <p>Columns represent stages in your workflow — for example: <em>To Do</em>, <em>In Progress</em>, <em>Done</em>. You can add, rename, reorder, and delete columns freely.</p>
+      <ul>
+        <li>Add a column using the <strong>+ Add column</strong> button on the top left of the board.</li>
+        <li>Column titles can be renamed by clicking on them to edit.</li>
+        <li>Delete a column from the delete column button in the column header (removes all cards inside it).</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="cards">
+      <div class="docs__section-label">03</div>
+      <h2>Cards</h2>
+      <p>Cards are the core unit of work. Each card has a title, description, priority, colour, subtasks, notes log, and AI chat assistant.</p>
+      <ul>
+        <li>Add a card with the <strong>+ Add card</strong> button at the top of any column, or by right-clicking the board.</li>
+        <li>Drag cards between columns and swimlanes.</li>
+        <li>Open a card to edit its description, add subtasks, notes, or converse with the AI assistant.</li>
+        <li>Set a priority (1–10) and a colour to help with visual scanning.</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="ai-chat">
+      <div class="docs__section-label">04</div>
+      <h2>AI Chat</h2>
+      <p>Each card has its own AI assistant. It has full context of the card — title, description, subtasks, and activity log — so you can ask questions, get summaries, or draft next steps without copy-pasting anything.</p>
+      <ul>
+        <li>Open any card and click the <strong>AI Chat</strong> tab.</li>
+        <li>Type a message and press Enter (or click Send).</li>
+        <li>The AI remembers the conversation history for that card.</li>
+        <li>Use the <strong>+</strong> button at the top of the chat to start a new conversation, or the clock button to browse chat history.</li>
+        <li>Use the globe button beside the chat input to allow the AI to search the internet when answering.</li>
+        <li>Choose from a wide variety of models in Settings — note that more capable models use your monthly AI budget faster.</li>
+      </ul>
+      <div class="docs__callout">
+        <span class="docs__callout-icon"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
+        <span>The AI assistant reads your card's full context automatically — no need to repeat yourself.</span>
+      </div>
+
+      <h3>Board Assistant</h3>
+      <p>Each board also has an assistant, opened with the <strong>Board Assistant</strong> button at the top of the board. It knows the board's columns, swimlanes and where each card sits, and reads card descriptions and subtasks when it needs them.</p>
+      <ul>
+        <li>Ask about the board, e.g. "What's still in progress?" or "Which cards have unfinished subtasks?"</li>
+        <li>Ask it to create a card (with a description and subtasks) or move a card, and it happens straight away.</li>
+        <li>Deleting needs your confirmation: the assistant shows the cards it wants to delete, and nothing is deleted until you click <strong>Delete</strong>.</li>
+        <li>Every change it makes is listed in the chat and noted in the card's log, and chats are kept so you can look back at them.</li>
+        <li>It needs a model that supports tool calling (for Ollama, e.g. <code>llama3.2</code> or <code>qwen2.5</code>). Small local models may misread requests, so check what it did.</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="swimlanes">
+      <div class="docs__section-label">05</div>
+      <h2>Swimlanes</h2>
+      <p>Swimlanes add a horizontal grouping layer across all columns — useful for separating work by team, epic, or priority tier.</p>
+      <ul>
+        <li>Add swimlanes from the button at the top left of the board.</li>
+        <li>Delete swimlanes from the swimlane header section.</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="attachments">
+      <div class="docs__section-label">06</div>
+      <h2>Attachments</h2>
+      <p>You can attach files to any card. Files are stored securely in the cloud.</p>
+      <ul>
+        <li>Open a card and go to the attachments button in the submenu.</li>
+        <li>Upload images, PDFs, or documents.</li>
+        <li>Click an attachment to view or download it.</li>
+        <li>If your file contains text, the AI assistant will use it as context when you ask questions.</li>
+      </ul>
+    </section>
+
+    <hr class="docs__divider">
+
+    <section class="docs__section" id="settings">
+      <div class="docs__section-label">07</div>
+      <h2>Settings &amp; AI providers</h2>
+      <p>Manage your account, theme, and AI configuration from the Settings page (accessible via the top-right user menu).</p>
+      <ul>
+        <li><strong>Theme</strong> — choose light, dark, or system default.</li>
+        <li><strong>AI model</strong> — pick the model you want to use from those your AI server offers. The server itself (local Ollama by default, or OpenRouter, LM Studio, OpenAI…) is set in the <code>.env</code> file.</li>
+        <li><strong>Account</strong> — update your username or password.</li>
+        <li><strong>Billing</strong> — manage your plan and subscription.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    const links = document.querySelectorAll('.docs__toc a');
+    const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+
+    // A clicked link stays active until the user scrolls themselves, since the
+    // last sections are too short to reach the top of the viewport.
+    let clicked = null;
+
+    function setActive() {
+      let current = sections[0];
+      sections.forEach(s => { if (s && window.scrollY + 120 >= s.offsetTop) current = s; });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        current = sections[sections.length - 1];
+      }
+      const activeHref = clicked ? clicked.getAttribute('href') : '#' + current.id;
+      links.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === activeHref);
+      });
+    }
+
+    links.forEach(a => a.addEventListener('click', () => { clicked = a; setActive(); }));
+    ['wheel', 'touchstart', 'keydown'].forEach(type =>
+      window.addEventListener(type, () => { clicked = null; }, { passive: true }));
+    window.addEventListener('scroll', setActive, { passive: true });
+    setActive();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %} 
+
+{% block title%}Sign Up - KanPlan{% endblock %}
+
+{% block additional_styles %}
+<link rel="stylesheet" href="{% static 'css/shopfront/signup.css' %}" />
+{% endblock %} 
+
+{% block content %}
+<main class="signup__main">
+ 
+  <aside class="signup__panel" aria-hidden="true">
+ 
+    <div class="signup__panel-body">
+      <h2 class="signup__panel-tagline">
+        Plan smarter.<br>Ship with <em>AI</em>.
+      </h2>
+      <p class="signup__panel-sub">
+        Join makers, analysts and students who use KanPlan to stay on top of their work.
+      </p>
+ 
+      <div class="signup__perks">
+        <div class="signup__perk">
+          <div class="signup__perk-icon"><i class="bi bi-lightning-charge" aria-hidden="true"></i></div>
+          <div class="signup__perk-text">
+            <strong>Up and running in 2 minutes</strong>
+            <span>Runs locally on your own machine</span>
+          </div>
+        </div>
+        <div class="signup__perk">
+          <div class="signup__perk-icon"><i class="bi bi-robot" aria-hidden="true"></i></div>
+          <div class="signup__perk-text">
+            <strong>AI Assistant included</strong>
+            <span>Connect your own API key and chat with your board</span>
+          </div>
+        </div>
+        <div class="signup__perk">
+          <div class="signup__perk-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></div>
+          <div class="signup__perk-text">
+            <strong>Secure &amp; private</strong>
+            <span>Your data stays yours — always</span>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+  </aside>
+ 
+  <section class="signup__main-section" aria-labelledby="signup-title">
+ 
+    <header class="signup__main-title">
+      <h1 id="signup-title">Create your account</h1>
+      <p>Join KanPlan and boost your productivity with AI</p>
+    </header>
+ 
+    {% if form.non_field_errors %}
+    <div class="signup__error-banner" role="alert">
+      <ul>
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+ 
+    {% if form.errors %}
+    <div class="signup__error-banner" role="alert" aria-live="polite">
+      <p>Please correct the errors below:</p>
+    </div>
+    {% endif %}
+ 
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <fieldset class="signup__main-fieldset">
+        {% for field in form %}
+        <div>
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+          <div id="{{ field.auto_id }}-help">{{ field.help_text|safe }}</div>
+          {% endif %}
+          {% if field.errors %}
+          <ul id="{{ field.auto_id }}-errors" role="alert" aria-live="polite">
+            {% for error in field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </fieldset>
+ 
+      <div class="signup__main-button">
+        <button type="submit">Create account →</button>
+      </div>
+    </form>
+ 
+    <nav class="signup__main-login" aria-label="Sign-in link">
+      <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </nav>
+ 
+  </section>
+</main>
+{% endblock %}

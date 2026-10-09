@@ -1,0 +1,325 @@
+{% extends "base.html" %} 
+
+{% load static %} 
+
+{% block title %}
+User Settings - KanPlan
+{% endblock %} 
+
+
+{% block additional_styles %}
+<link rel="stylesheet" href="{% static 'css/settings/settings.css' %}"/>
+{% endblock %} 
+
+{% block content %}
+<div class="settings-container">
+ 
+  <div class="settings-header">
+    <a href="{{ back_url }}" class="settings-back-btn">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+
+    <h1 class="settings-page-title">
+      <div class="settings-title-icon"><i class="bi bi-gear" aria-hidden="true"></i></div>
+      User Settings
+    </h1>
+  </div>
+ 
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
+      <h2>Profile</h2>
+    </div>
+    <div class="settings-section__body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="settings-row">
+          <label>Username</label>
+          <div class="settings-form__row">
+            <input type="text" name="username" placeholder="{{ user.username }}" />
+            <button id="edit-username" formaction="{% url 'edit_username' %}" formmethod="post" type="submit">
+              Update
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-clock" aria-hidden="true"></i></span>
+      <h2>Time</h2>
+    </div>
+    <div class="settings-section__body">
+      <form>
+        <div class="settings-row">
+          <label for="id_timezone">Time Zone (detected from browser)</label>
+          <input type="text" id="id_timezone" name="timezone" value="{{ request.user.profile.timezone }}" readonly class="settings__input" />
+        </div>
+      </form>
+    </div>
+  </div>
+ 
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+      <h2>Security</h2>
+    </div>
+    <div class="settings-section__body">
+      <form method="post">
+        {% csrf_token %}
+        <button type="button" id="edit-password-button">Change Password</button>
+      </form>
+    </div>
+  </div>
+ 
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-robot" aria-hidden="true"></i></span>
+      <h2>AI Assistant</h2>
+    </div>
+    <div class="settings-section__body">
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="settings-checkbox-row">
+          <label class="settings-checkbox-label">
+            <input type="checkbox" name="ai_chat_always_open" {% if profile.ai_chat_always_open %}checked{% endif %}>
+            Keep AI chat open when viewing cards
+          </label>
+          <button type="submit">Update</button>
+        </div>
+      </form>
+
+
+      <div class="ai-model-current">
+        <div class="ai-model-current__info">
+          <div class="ai-model-current__label">Active Model</div>
+          <div class="ai-model-current__name" id="ai-current-model-name">
+            {{ ai_model_name }}
+          </div>
+          <div class="ai-model-current__provider">
+            via {{ ai_provider }} · {{ ai_base_url }}
+          </div>
+        </div>
+        <button type="button" id="open-model-picker">Change Model</button>
+      </div>
+
+      <div class="ai-connection" id="ai-connection">
+        <div class="settings-row">
+          <label class="settings-label">Connection</label>
+          <div class="theme-picker provider-picker">
+            <label class="theme-option">
+              <input type="radio" name="ai_provider" value=""{% if not profile.ai_provider %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-hdd-rack" aria-hidden="true"></i></span>
+              <span class="theme-option__label">Server default</span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="ai_provider" value="ollama"{% if profile.ai_provider == 'ollama' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
+              <span class="theme-option__label">Ollama</span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="ai_provider" value="lmstudio"{% if profile.ai_provider == 'lmstudio' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-display" aria-hidden="true"></i></span>
+              <span class="theme-option__label">LM Studio</span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="ai_provider" value="openrouter"{% if profile.ai_provider == 'openrouter' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-globe" aria-hidden="true"></i></span>
+              <span class="theme-option__label">OpenRouter</span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="ai_provider" value="custom"{% if profile.ai_provider == 'custom' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-plug" aria-hidden="true"></i></span>
+              <span class="theme-option__label">Other</span>
+            </label>
+          </div>
+          <p class="ai-connection__hint" id="ai-connection-hint"></p>
+        </div>
+
+        <div class="settings-row" id="ai-base-url-row">
+          <label for="ai-base-url">Server URL</label>
+          <input type="text" id="ai-base-url" autocomplete="off" spellcheck="false" />
+        </div>
+
+        <div class="settings-row" id="ai-api-key-row">
+          <label for="ai-api-key">API key</label>
+          <input type="password" id="ai-api-key" autocomplete="off" spellcheck="false" />
+        </div>
+
+        <div class="ai-connection__actions">
+          <span class="ai-connection__status" id="ai-connection-status" role="status"></span>
+          <button type="button" id="test-ai-connection">Test</button>
+          <button type="button" id="save-ai-connection">Save Connection</button>
+        </div>
+      </div>
+      {{ ai_connection|json_script:"ai-connection-data" }}
+
+    </div>
+  </div>
+ 
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-palette" aria-hidden="true"></i></span>
+      <h2>Appearance</h2>
+    </div>
+    <div class="settings-section__body">
+      <form method="post" action="{% url 'edit_theme' %}" id="theme-form">
+        {% csrf_token %}
+        <div class="settings-row">
+          <label class="settings-label">Theme</label>
+          <div class="theme-picker">
+            <label class="theme-option{% if profile.theme == 'light' %} theme-option--active{% endif %}">
+              <input type="radio" name="theme" value="light"{% if profile.theme == 'light' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-sun" aria-hidden="true"></i></span>
+              <span class="theme-option__label">Light</span>
+            </label>
+            <label class="theme-option{% if profile.theme == 'dark' or not profile.theme %} theme-option--active{% endif %}">
+              <input type="radio" name="theme" value="dark"{% if profile.theme == 'dark' or not profile.theme %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-moon" aria-hidden="true"></i></span>
+              <span class="theme-option__label">Dark</span>
+            </label>
+            <label class="theme-option{% if profile.theme == 'system' %} theme-option--active{% endif %}">
+              <input type="radio" name="theme" value="system"{% if profile.theme == 'system' %} checked{% endif %}>
+              <span class="theme-option__icon"><i class="bi bi-laptop" aria-hidden="true"></i></span>
+              <span class="theme-option__label">System</span>
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section__head">
+      <span class="settings-section__head-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span>
+      <h2>Account</h2>
+    </div>
+    <div class="settings-section__body">
+      <div class="settings-action-row">
+        <form method="post">
+          {% csrf_token %}
+          <button type="button" id="delete-account-button" class="btn-danger">Delete Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+ 
+ 
+  <div id="model-picker-backdrop" class="settings-modal-backdrop">
+    <div id="model-picker-modal" class="smodal smodal--wide">
+      <div class="smodal__header">
+        <div class="smodal__header-icon"><i class="bi bi-cpu"></i></div>
+        <div>
+          <h2 class="smodal__title">Choose AI Model</h2>
+          <p class="smodal__subtitle">All models are free to use.</p>
+        </div>
+      </div>
+      <div class="smodal__body">
+        <div class="smodal__field">
+          <input
+            type="text"
+            id="model-search"
+            placeholder="Search models… (e.g. claude, gpt-4o, gemini)"
+            autocomplete="off"
+            class="smodal__input"
+          />
+        </div>
+        <div id="model-list-container">
+          <div id="model-list-loading" class="model-list-state">Loading models…</div>
+          <div id="model-list-error"   class="model-list-state" style="display:none;">
+            Failed to load models. Please try again.
+          </div>
+          <ul id="model-list" class="model-list" style="display:none;"></ul>
+        </div>
+        <p id="model-picker-error" class="smodal__error"></p>
+      </div>
+      <div class="smodal__footer">
+        <button type="button" id="cancel-model-picker" class="smodal__btn smodal__btn--ghost">Cancel</button>
+        <button type="button" id="confirm-model-picker" class="smodal__btn smodal__btn--primary" disabled>Select Model</button>
+      </div>
+    </div>
+  </div>
+ 
+ 
+  <div id="password-modal-backdrop" class="settings-modal-backdrop">
+    <form id="password-modal" class="smodal" method="post" action="{% url 'edit_password' %}">
+      {% csrf_token %}
+      <div class="smodal__header">
+        <div class="smodal__header-icon"><i class="bi bi-shield-lock"></i></div>
+        <div>
+          <h2 class="smodal__title">Change password</h2>
+          <p class="smodal__subtitle">Confirm your current password first.</p>
+        </div>
+      </div>
+      <div class="smodal__body">
+        <div class="smodal__field">
+          <label for="current-password" class="smodal__label">Current password</label>
+          <input type="password" id="current-password" name="current_password" placeholder="Enter current password" autocomplete="current-password" class="smodal__input" />
+        </div>
+        <div class="smodal__field">
+          <label for="new-password" class="smodal__label">New password</label>
+          <input type="password" id="new-password" name="new_password" placeholder="Choose a new password" autocomplete="new-password" class="smodal__input" />
+        </div>
+        <div class="smodal__field">
+          <label for="confirm-new-password" class="smodal__label">Confirm new password</label>
+          <input type="password" id="confirm-new-password" name="confirm_password" placeholder="Re-enter new password" autocomplete="new-password" class="smodal__input" />
+        </div>
+      </div>
+      <div class="smodal__footer">
+        <button id="cancel-password-change" type="button" class="smodal__btn smodal__btn--ghost">Cancel</button>
+        <button id="confirm-password-change" type="submit" class="smodal__btn smodal__btn--primary">Update password</button>
+      </div>
+    </form>
+  </div>
+ 
+ 
+  <div id="delete-account-modal-backdrop" class="settings-modal-backdrop">
+    <form id="delete-account-modal" class="smodal" method="post" action="{% url 'delete_account' %}">
+      {% csrf_token %}
+      <div class="smodal__header">
+        <div class="smodal__header-icon smodal__header-icon--danger"><i class="bi bi-exclamation-triangle"></i></div>
+        <div>
+          <h2 class="smodal__title">Delete your account</h2>
+          <p class="smodal__subtitle">This is permanent and cannot be undone.</p>
+        </div>
+      </div>
+      <div class="smodal__body">
+        <div class="smodal__warning" role="alert">
+          <ul>
+            <li>This action cannot be undone.</li>
+            <li>You will be signed out immediately.</li>
+            <li>All data tied to your account will be removed.</li>
+            <li><strong>Important:</strong> If you have a paid subscription, please cancel it first to avoid further charges (Settings → Manage Subscription).</li>
+          </ul>
+        </div>
+        <div class="smodal__field">
+          <label for="delete-account-password" class="smodal__label">Confirm your password</label>
+          <input
+            type="password"
+            id="delete-account-password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+            class="smodal__input"
+          />
+        </div>
+        <label class="smodal__checkbox-label">
+          <input type="checkbox" name="confirm_delete" required />
+          I understand this will permanently delete my account and all associated data.
+        </label>
+      </div>
+      <div class="smodal__footer">
+        <button id="cancel-delete-account" type="button" class="smodal__btn smodal__btn--ghost">Cancel</button>
+        <button id="confirm-delete-account" type="submit" class="smodal__btn smodal__btn--danger">Permanently delete</button>
+      </div>
+    </form>
+  </div>
+ 
+</div>
+ 
+<script src="{% static 'js/utilities/settings.js' %}"></script>
+{% endblock %}

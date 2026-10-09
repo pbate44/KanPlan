@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block additional_styles %}
+  <link rel="stylesheet" href="{% static 'css/board/mainboard/card-context-menu.css' %}">
+  <link rel="stylesheet" href="{% static 'css/board/mainboard/board-ai.css' %}">
+{% endblock %}
+
+{% block nav_actions %}
+<li class="nav__board-ai">
+  <button type="button" class="nav-dashboard-btn board-ai-toggle" id="board-ai-toggle" aria-controls="board-ai-panel" aria-expanded="false">
+    <span class="material-symbols-outlined" aria-hidden="true">smart_toy</span>
+    <span>Board Assistant</span>
+  </button>
+</li>
+{% endblock %}
+
+{% block board_title %}
+<details class="nav__board-switcher-details">
+  <summary class="nav__board-switcher-summary">
+    <i class="bi bi-kanban nav__board-switcher-icon"></i>
+    <span class="nav__board-switcher-name">{{ board.name }}</span>
+    <span class="nav__chevron material-symbols-outlined" aria-hidden="true">expand_more</span>
+  </summary>
+  <ul class="nav__board-switcher-list">
+    {% for b in user_boards %}
+      {% if b.id != board.id %}
+      <li class="nav__board-switcher-item">
+        <a href="{% url 'board_detail' b.id %}">
+          <i class="bi bi-kanban nav__board-switcher-item-icon"></i>
+          {{ b.name }}
+        </a>
+      </li>
+      {% endif %}
+    {% endfor %}
+    {% if user_boards|length == 1 %}
+      <li class="nav__board-switcher-empty">No other boards</li>
+    {% endif %}
+  </ul>
+</details>
+{% endblock %}
+
+{% block content %} 
+  {% csrf_token %}
+  <div>
+    <div class="board-wrapper"
+          data-max-swimlanes="{{ max_swimlanes }}"
+          data-max-columns="{{ max_columns }}"
+          data-max-cards="{{ max_cards }}"
+          data-current-swimlanes="{{ swimlanes|length }}"
+          data-current-columns="{{ columns|length }}"
+          data-card-count="{{ card_count }}">
+
+      <div class="kanban-board" data-columns="{{ columns|length }}" data-swimlanes="{{ swimlanes|length }}">
+
+        <div class="board-header">
+
+          <div class="header-spacer">
+            <button id="addSwimlaneBtn" 
+                    class="addSwimlaneBtn btn-outline-primary" 
+                    title="Add new swimlane ({{ swimlanes|length }}/{{ max_swimlanes }})" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top">
+              <i class="bi bi-distribute-vertical"></i>
+            </button>
+            <button id="addColumnBtn" 
+                    class="addColumnBtn btn-outline-primary" 
+                    title="Add new column ({{ columns|length }}/{{ max_columns }})"
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+
+          {% for column in columns %}
+            <div class="column-header" data-column-id="{{ column.id }}" data-column-color="{{ column.color }}">
+              <div class="column-header-content">
+                <h4 class="column-name" data-column-id="{{ column.id }}">{{ column.name }}</h4>
+                <div class="column-actions">
+
+                  <button type="button"
+                          class="addCardButton"
+                          data-column-id="{{ column.id }}"
+                          data-column-name="{{ column.name }}"
+                          title="Add Card">
+                    <i class="bi bi-plus-lg"></i>
+                  </button>
+                  
+                  {% if columns|length > 1 %}
+                  <button class="dropdown-item delete-column-btn dropdown-item-danger" title="Delete column" data-column-id="{{ column.id }}" data-column-name="{{ column.name }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  {% endif %}
+                  
+                </div>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+
+
+        {% for swimlane in swimlanes %}
+          <div class="swimlane-row" data-swimlane-id="{{ swimlane.id }}">
+            
+            <div class="swimlane-header">
+              <span class="swimlane-name">{{ swimlane.name }}</span>
+              <div class="swimlane-actions">
+                <button title="Delete swimlane" 
+                        class="delete-swimlane-btn" 
+                        data-swimlane-id="{{ swimlane.id }}" 
+                        data-swimlane-name="{{ swimlane.name }}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            
+            {% for column in columns %}
+              <div class="board-cell" data-column-id="{{ column.id }}" data-swimlane-id="{{ swimlane.id }}" data-column-color="{{ column.color }}" data-column-name="{{ column.name }}">
+                <ul class="card-list" data-column-id="{{ column.id }}" data-swimlane-id="{{ swimlane.id }}">
+
+                  {% for card in column.cards.all %}
+                    {% if card.swimlane_id == swimlane.id or card.swimlane_id is None and forloop.parentloop.counter == 1 %}
+
+                      <li class="card-item{% if card.css_class %} {{ card.css_class }}{% endif %}" 
+                          {% if card.color and card.color != '#f1f1f1' and not card.css_class %}
+                          style="background-color: {{ card.color }};"
+                          {% endif %}
+                          data-card-id="{{ card.id }}"
+                          data-href="{% url 'card_detail' card_id=card.id %}"
+                          data-card-title="{{ card.title }}"
+                          data-priority="{{ card.priority }}"
+                          data-swimlane-id="{{ swimlane.id }}"
+                          data-card-color="{% if card.color %}{{ card.color }}{% else %}white{% endif %}"
+                          {% if card.css_class %}data-css-class="{{ card.css_class }}"{% endif %}>
+
+                          <div class="card-content">
+                            {{ card.title }}
+                          </div>
+                          
+                          {% if card.priority > 0 %}
+                          <span class="importance-indicator priority-badge" 
+                                data-priority="{{ card.priority }}"
+                                data-priority-level="{% if card.priority <= 3 %}low{% elif card.priority <= 7 %}medium{% else %}high{% endif %}">
+                            {{ card.priority }}
+                          </span>
+                          {% endif %}
+
+                      </li>
+
+                    {% endif %}
+                  {% endfor %}
+
+                </ul>
+
+              </div>
+            {% endfor %}
+
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+  
+
+
+
+
+  <div class="modal kmodal" id="addCardModal" tabindex="-1" aria-labelledby="addCardLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="addCardLabel">
+            <i class="bi bi-stickies kmodal__title-icon"></i>
+            Add Card to&nbsp;<span id="columnNameDisplay"></span>
+          </h5>
+          <button type="button" class="btn-close btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <form id="addCardForm">
+            <input type="hidden" id="columnId" name="column_id" value="">
+            <input type="hidden" id="swimlaneId" name="swimlane_id" value="">
+            <input type="hidden" id="addCardColor" name="color" value="">
+            <input type="hidden" id="addCardPriority" name="priority" value="0">
+
+            <div class="mb-3">
+              <label for="cardTitle" class="form-label kmodal__label">Card Title</label>
+              <input type="text" class="form-control kmodal__input" id="cardTitle" name="title" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="cardDescription" class="form-label kmodal__label">Description (optional)</label>
+              <textarea class="form-control kmodal__input" id="cardDescription" name="description" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label kmodal__label">Color</label>
+              <div id="addCardColorGrid">
+                <div class="card-color-swatch" data-color="rgb(240, 248, 255)" data-css-class="card-color-default" style="background-color: rgb(var(--card-color-default-rgb)); border: 2px solid var(--border);" title="Default"></div>
+                <div class="card-color-swatch" data-color="rgb(241, 11, 11)"   data-css-class="card-color-red"     style="background-color: rgb(var(--card-color-red-rgb));"   title="Red"></div>
+                <div class="card-color-swatch" data-color="rgb(247, 103, 7)"   data-css-class="card-color-orange"  style="background-color: rgb(var(--card-color-orange-rgb));"   title="Orange"></div>
+                <div class="card-color-swatch" data-color="rgb(247, 243, 11)"  data-css-class="card-color-yellow"  style="background-color: rgb(var(--card-color-yellow-rgb));"  title="Yellow"></div>
+                <div class="card-color-swatch" data-color="rgb(165, 231, 9)"   data-css-class="card-color-light-green" style="background-color: rgb(var(--card-color-light-green-rgb));"  title="Light Green"></div>
+                <div class="card-color-swatch" data-color="rgb(12, 133, 8)"    data-css-class="card-color-dark-green"  style="background-color: rgb(var(--card-color-dark-green-rgb));"   title="Dark Green"></div>
+                <div class="card-color-swatch" data-color="rgb(13, 160, 111)"  data-css-class="card-color-teal"    style="background-color: rgb(var(--card-color-teal-rgb));"  title="Teal"></div>
+                <div class="card-color-swatch" data-color="rgb(20, 197, 159)"  data-css-class="card-color-cyan"    style="background-color: rgb(var(--card-color-cyan-rgb));"  title="Cyan"></div>
+                <div class="card-color-swatch" data-color="rgb(15, 41, 161)"   data-css-class="card-color-blue"    style="background-color: rgb(var(--card-color-blue-rgb));"   title="Blue"></div>
+                <div class="card-color-swatch" data-color="rgb(118, 11, 240)"  data-css-class="card-color-purple"  style="background-color: rgb(var(--card-color-purple-rgb));"  title="Purple"></div>
+                <div class="card-color-swatch" data-color="rgb(194, 8, 178)"   data-css-class="card-color-magenta" style="background-color: rgb(var(--card-color-magenta-rgb));"   title="Magenta"></div>
+                <div class="card-color-swatch" data-color="rgb(230, 20, 90)"   data-css-class="card-color-pink"    style="background-color: rgb(var(--card-color-pink-rgb));"   title="Pink"></div>
+                <div class="card-color-swatch" data-color="rgb(2, 9, 15)"      data-css-class="card-color-dark"    style="background-color: rgb(var(--card-color-dark-rgb));"      title="Dark"></div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label kmodal__label">Priority <span class="kmodal__muted" style="font-size:0.8rem;">(optional)</span></label>
+              <div id="addCardPriorityGrid">
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="1">1</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="2">2</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="3">3</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="4">4</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="5">5</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="6">6</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="7">7</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="8">8</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="9">9</button>
+                <button type="button" class="ctx-priority-btn add-card-priority-btn" data-value="10">10</button>
+              </div>
+              <p class="mt-2 mb-0 kmodal__muted" style="font-size:0.8rem;">1–3 low &nbsp;·&nbsp; 4–7 medium &nbsp;·&nbsp; 8–10 high</p>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 kmodal__actions">
+              <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary kmodal__btn kmodal__btn--primary">Save Card</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal" id="addSwimlaneModal" tabindex="-1" aria-labelledby="addSwimlaneLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="addSwimlaneLabel">
+            <i class="bi bi-view-stacked kmodal__title-icon"></i>
+            Add New Swimlane
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <form id="addSwimlaneForm">
+            <div class="mb-3">
+              <label for="swimlaneName" class="form-label kmodal__label">Swimlane Name</label>
+              <input type="text" placeholder="Enter swimlane name..." class="form-control kmodal__input" id="swimlaneName" name="name" maxlength="50" autocomplete="off" required>
+              <div class="form-text kmodal__help">
+                <i class="bi bi-info-circle me-1"></i>
+                Maximum {{ max_swimlanes }} swimlanes per board. Current: <span id="swimlaneCurrentCount">{{ swimlanes|length }}</span>/{{ max_swimlanes }}
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 kmodal__actions">
+              <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary kmodal__btn kmodal__btn--primary">Add Swimlane</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal" id="addColumnModal" tabindex="-1" aria-labelledby="addColumnLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="addColumnLabel">
+            <i class="bi bi-plus-circle kmodal__title-icon"></i>
+            Add New Column
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <form id="addColumnForm" data-board-id="{{ board.id }}">
+            <div class="mb-3">
+              <label for="columnName" class="form-label fw-semibold kmodal__label">Column Name</label>
+              <input type="text" class="form-control kmodal__input" id="columnName" name="name" placeholder="Enter column name..." required autocomplete="off">
+              <div class="form-text mt-2 kmodal__help">
+                <i class="bi bi-info-circle me-1"></i> Maximum {{ max_columns }} columns per board. Current: {{ columns|length }}/{{ max_columns }}
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i>Cancel
+          </button>
+          <button type="submit" form="addColumnForm" class="btn btn-primary kmodal__btn kmodal__btn--primary" id="submitColumnBtn">
+            <i class="bi bi-plus-lg me-1"></i>Add Column
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal" id="deleteColumnModal" tabindex="-1" aria-labelledby="deleteColumnLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header kmodal__header--danger">
+          <h5 class="modal-title kmodal__title" id="deleteColumnLabel">
+            <i class="bi bi-exclamation-triangle kmodal__title-icon"></i>
+            Delete Column
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <div class="kmodal__callout kmodal__callout--warning mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+          <p>Are you sure you want to delete the column <strong id="deleteColumnName"></strong>?</p>
+          <p class="mb-0 kmodal__muted">All cards in this column will also be permanently deleted.</p>
+        </div>
+
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger kmodal__btn kmodal__btn--danger" id="confirmDeleteColumn">
+            <i class="bi bi-trash me-2"></i>Delete Column
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal" id="deleteSwimlaneModal" tabindex="-1" aria-labelledby="deleteSwimlaneLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header kmodal__header--danger">
+          <h5 class="modal-title kmodal__title" id="deleteSwimlaneLabel">
+            <i class="bi bi-exclamation-triangle kmodal__title-icon"></i>
+            Delete Swimlane
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <div class="kmodal__callout kmodal__callout--warning mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+
+          <p>Are you sure you want to delete the swimlane <strong id="deleteSwimlaneNameDisplay"></strong>?</p>
+          <p class="mb-0 kmodal__muted">All cards in this swimlane will also be permanently deleted.</p>
+        </div>
+
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i>Cancel
+          </button>
+          <button type="button" class="btn btn-danger kmodal__btn kmodal__btn--danger" id="confirmDeleteSwimlane">
+            <i class="bi bi-trash me-2"></i>Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal" id="cardDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl kmodal__dialog kmodal__dialog--xl">
+      <div class="modal-content kmodal__content kmodal__content--flush">
+        <div id="cardDetailContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardContextMenu" role="menu" aria-label="Card actions">
+    <div class="ctx-menu__item" id="ctxMenuChangeTitle" role="menuitem" tabindex="-1">
+      <i class="bi bi-pencil"></i> Change title
+    </div>
+    <div class="ctx-menu__item" id="ctxMenuChangeColor" role="menuitem" tabindex="-1">
+      <i class="bi bi-palette"></i> Change color
+    </div>
+    <div class="ctx-menu__item" id="ctxMenuChangePriority" role="menuitem" tabindex="-1">
+      <i class="bi bi-flag"></i> Change priority
+    </div>
+    <div class="ctx-menu__divider"></div>
+    <div class="ctx-menu__item ctx-menu__item--danger" id="ctxMenuDeleteCard" role="menuitem" tabindex="-1">
+      <i class="bi bi-trash"></i> Delete card
+    </div>
+  </div>
+
+  <div id="cellContextMenu" role="menu" aria-label="Cell actions">
+    <div class="ctx-menu__item" id="cellCtxAddCard" role="menuitem" tabindex="-1">
+      <i class="bi bi-plus-lg"></i> Add card here
+    </div>
+  </div>
+
+  <div class="modal kmodal qmodal" id="ctxTitleModal" tabindex="-1" aria-labelledby="ctxTitleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="ctxTitleLabel">
+            <i class="bi bi-pencil kmodal__title-icon"></i> Change Card Title
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body kmodal__body">
+          <input type="text" id="ctxTitleInput" class="form-control kmodal__input" placeholder="Card title…" maxlength="100" autocomplete="off">
+        </div>
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary kmodal__btn kmodal__btn--primary" id="ctxTitleSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal qmodal" id="ctxColorModal" tabindex="-1" aria-labelledby="ctxColorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="ctxColorLabel">
+            <i class="bi bi-palette kmodal__title-icon"></i> Change Card Color
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body kmodal__body">
+          <div id="ctxColorGrid">
+            <div class="card-color-swatch" data-color="rgb(240, 248, 255)" data-css-class="card-color-default" style="background-color: rgb(var(--card-color-default-rgb)); border: 2px solid var(--border);" title="Default"></div>
+            <div class="card-color-swatch" data-color="rgb(241, 11, 11)"   data-css-class="card-color-red"     style="background-color: rgb(var(--card-color-red-rgb));"   title="Red"></div>
+            <div class="card-color-swatch" data-color="rgb(247, 103, 7)"   data-css-class="card-color-orange"  style="background-color: rgb(var(--card-color-orange-rgb));"   title="Orange"></div>
+            <div class="card-color-swatch" data-color="rgb(247, 243, 11)"  data-css-class="card-color-yellow"  style="background-color: rgb(var(--card-color-yellow-rgb));"  title="Yellow"></div>
+            <div class="card-color-swatch" data-color="rgb(165, 231, 9)"   data-css-class="card-color-light-green" style="background-color: rgb(var(--card-color-light-green-rgb));"  title="Light Green"></div>
+            <div class="card-color-swatch" data-color="rgb(12, 133, 8)"    data-css-class="card-color-dark-green"  style="background-color: rgb(var(--card-color-dark-green-rgb));"   title="Dark Green"></div>
+            <div class="card-color-swatch" data-color="rgb(13, 160, 111)"  data-css-class="card-color-teal"    style="background-color: rgb(var(--card-color-teal-rgb));"  title="Teal"></div>
+            <div class="card-color-swatch" data-color="rgb(20, 197, 159)"  data-css-class="card-color-cyan"    style="background-color: rgb(var(--card-color-cyan-rgb));"  title="Cyan"></div>
+            <div class="card-color-swatch" data-color="rgb(15, 41, 161)"   data-css-class="card-color-blue"    style="background-color: rgb(var(--card-color-blue-rgb));"   title="Blue"></div>
+            <div class="card-color-swatch" data-color="rgb(118, 11, 240)"  data-css-class="card-color-purple"  style="background-color: rgb(var(--card-color-purple-rgb));"  title="Purple"></div>
+            <div class="card-color-swatch" data-color="rgb(194, 8, 178)"   data-css-class="card-color-magenta" style="background-color: rgb(var(--card-color-magenta-rgb));"   title="Magenta"></div>
+            <div class="card-color-swatch" data-color="rgb(230, 20, 90)"   data-css-class="card-color-pink"    style="background-color: rgb(var(--card-color-pink-rgb));"   title="Pink"></div>
+            <div class="card-color-swatch" data-color="rgb(2, 9, 15)"      data-css-class="card-color-dark"    style="background-color: rgb(var(--card-color-dark-rgb));"      title="Dark"></div>
+          </div>
+        </div>
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary kmodal__btn kmodal__btn--primary" id="ctxColorSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal qmodal" id="ctxPriorityModal" tabindex="-1" aria-labelledby="ctxPriorityLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="ctxPriorityLabel">
+            <i class="bi bi-flag kmodal__title-icon"></i> Change Priority
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body kmodal__body">
+          <div id="ctxPriorityGrid">
+            <button class="ctx-priority-btn" data-value="1">1</button>
+            <button class="ctx-priority-btn" data-value="2">2</button>
+            <button class="ctx-priority-btn" data-value="3">3</button>
+            <button class="ctx-priority-btn" data-value="4">4</button>
+            <button class="ctx-priority-btn" data-value="5">5</button>
+            <button class="ctx-priority-btn" data-value="6">6</button>
+            <button class="ctx-priority-btn" data-value="7">7</button>
+            <button class="ctx-priority-btn" data-value="8">8</button>
+            <button class="ctx-priority-btn" data-value="9">9</button>
+            <button class="ctx-priority-btn" data-value="10">10</button>
+          </div>
+          <p class="mt-2 mb-0 kmodal__muted" style="font-size:0.8rem;">1–3 low &nbsp;·&nbsp; 4–7 medium &nbsp;·&nbsp; 8–10 high</p>
+        </div>
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary kmodal__btn kmodal__btn--primary" id="ctxPrioritySaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal kmodal qmodal" id="ctxDeleteCardModal" tabindex="-1" aria-labelledby="ctxDeleteCardLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+        <div class="modal-header kmodal__header kmodal__header--danger">
+          <h5 class="modal-title kmodal__title" id="ctxDeleteCardLabel">
+            <i class="bi bi-exclamation-triangle kmodal__title-icon"></i> Delete Card
+          </h5>
+          <button type="button" class="btn-close btn-close-white kmodal__close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body kmodal__body">
+          <div class="kmodal__callout kmodal__callout--warning mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+          <p>Are you sure you want to delete <strong id="ctxDeleteCardTitle"></strong>?</p>
+        </div>
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn btn-outline-secondary kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger kmodal__btn kmodal__btn--danger" id="ctxConfirmDeleteBtn">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="ai-chat-panel board-ai-panel" id="board-ai-panel" data-board-id="{{ board.id }}" aria-label="Board assistant">
+    <div class="ai-chat-container">
+
+      <div class="ai-chat-header">
+        <div class="ai-chat-header__left">
+          <h5><i class="bi bi-robot me-2"></i>Board Assistant</h5>
+          <span class="ai-model-tag" title="{{ ai_model_display }}">{{ ai_model_display }}</span>
+        </div>
+        <div>
+          <button type="button" class="board-ai-header-btn" id="board-ai-history" title="Chat history"><i class="bi bi-clock-history"></i></button>
+          <button type="button" class="board-ai-header-btn" id="board-ai-new" title="New chat"><i class="bi bi-plus-circle"></i></button>
+          <button type="button" class="board-ai-header-btn" id="board-ai-close" title="Close"><i class="bi bi-x"></i></button>
+        </div>
+      </div>
+
+      <div class="ai-chat-body" id="board-ai-body">
+        <div class="ai-chat-messages" id="board-ai-messages"></div>
+      </div>
+
+      <div class="ai-sessions-view d-none" id="board-ai-sessions-view">
+        <div class="ai-sessions-header">
+          <button type="button" class="board-ai-back" id="board-ai-back"><i class="bi bi-arrow-left me-1"></i>Back</button>
+          <span>Chat History</span>
+        </div>
+        <div class="ai-sessions-list" id="board-ai-sessions-list"></div>
+      </div>
+
+      <form id="board-ai-form" class="ai-chat-form">
+        <div class="ai-chat-form__controls">
+          {% if ai_web_search %}
+          <button type="button" class="board-ai-icon-btn" id="board-ai-web-search" title="Toggle web search" aria-pressed="false">
+            <i class="bi bi-globe2"></i>
+          </button>
+          {% endif %}
+          <textarea id="board-ai-input" class="ai-chat-input form-control" rows="1" maxlength="2000" placeholder="Ask about this board…" autocomplete="off"></textarea>
+          <button type="submit" class="board-ai-submit" id="board-ai-submit" title="Send">
+            <i class="bi bi-send"></i>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </aside>
+
+{% endblock %}
+
+{% block scripts %}
+
+  <script src="{% static 'js/board/board_utils.js' %}"></script>
+
+  <script src="{% static 'js/board/board.js' %}"></script>
+
+  <script src="{% static 'js/board/columns.js' %}"></script>
+
+  <script src="{% static 'js/board/swimlanes.js' %}"></script>
+
+  <script src="{% static 'js/card/card_logs.js' %}"></script>
+  <script src="{% static 'js/card/card_priority.js' %}"></script>
+  <script src="{% static 'js/card/card_description.js' %}"></script>
+  <script src="{% static 'js/card/card_color.js' %}"></script>
+  <script src="{% static 'js/card/card_subtasks.js' %}"></script>
+  <script src="{% static 'js/card/card_pdf.js' %}"></script>
+  <script src="{% static 'js/card/card_ai_chat.js' %}"></script>
+  <script src="{% static 'js/board/board_ai_chat.js' %}"></script>
+  <script src="{% static 'js/card/card_attachments.js' %}"></script>
+
+  <script src="{% static 'js/card/card_details.js' %}"></script>
+  <script src="{% static 'js/card/card_context_menu.js' %}"></script>
+  <script src="{% static 'js/board/cell_context_menu.js' %}"></script>
+
+  <script>
+    document.addEventListener('click', function (e) {
+      var details = document.querySelector('.nav__board-switcher-details');
+      if (details && details.open && !details.contains(e.target)) {
+        details.open = false;
+      }
+    });
+  </script>
+{% endblock %}

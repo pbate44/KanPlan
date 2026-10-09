@@ -1,0 +1,79 @@
+{% extends "base.html" %} 
+{% load form_tags %} 
+{% load static %} 
+
+{% block title%}Login - KanPlan{% endblock %}
+
+{% block additional_styles %}
+<link rel="stylesheet" href="{% static 'css/shopfront/login.css' %}" />
+{% endblock %}
+
+{% block content %}
+<main class="login__main">
+  <section class="login__main-section" aria-labelledby="login-title">
+ 
+    <header class="login__main-title">
+      <div class="login__logo-badge" aria-hidden="true">
+        <span class="brand-logo" role="img" aria-label="KanPlan logo"></span>
+      </div>
+      <h1 id="login-title">Welcome back</h1>
+      <p>Log in to access your boards.</p>
+    </header>
+ 
+    {% if form.errors %}
+    <div class="login__alert" role="alert" aria-live="assertive">
+      <strong>Sign-in failed</strong>
+      <p>Your username and password didn't match. Please try again.</p>
+    </div>
+    {% endif %}
+ 
+    <div class="login__main-fieldset">
+      <form method="post" novalidate class="login__form">
+        {% csrf_token %}
+ 
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+ 
+        {% for field in form %}
+        <div class="login__field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% if field.errors %}
+          <div class="login__field-error" role="alert" aria-live="polite">
+            {% for error in field.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {{ field }}
+          {% if field.help_text %}
+          <small class="login__help-text">{{ field.help_text }}</small>
+          {% endif %}
+        </div>
+        {% endfor %}
+ 
+        <div class="login__options">
+          <div class="login__remember">
+            <input
+              class="login__remember-checkbox"
+              type="checkbox"
+              id="id_remember"
+              name="remember"
+            />
+            <label for="id_remember">Remember me</label>
+          </div>
+        </div>
+ 
+        <button class="login__main-submit" type="submit">
+          <span>Log in</span>
+        </button>
+      </form>
+    </div>
+ 
+    <div class="login__main-signup">
+      <p>Need an account? <a href="{% url 'signup' %}">Sign up free</a></p>
+    </div>
+ 
+  </section>
+</main>
+{% endblock %}

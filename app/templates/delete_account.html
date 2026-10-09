@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<main class="settings__main">
+  <section class="settings__section">
+    <header class="settings__header danger">Delete Account</header>
+
+    <form method="post" class="delete-account-form">
+      {% csrf_token %}
+      <p><i class="bi bi-exclamation-triangle" aria-hidden="true"></i> This action cannot be undone. All your data will be permanently deleted.</p>
+
+      <div class="settings__field">
+        {{ form.confirm_username|add_class:"settings__input" }}
+      </div>
+      
+      <button type="submit" class="btn btn-danger">Confirm Delete</button>
+      <a href="{% url 'user_settings' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </section>
+</main>
+{% endblock %}

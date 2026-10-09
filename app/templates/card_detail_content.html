@@ -1,0 +1,512 @@
+{% load static %}
+
+<div class="card-detail-container p-4{% if card.css_class %} {{ card.css_class }}{% endif %}" 
+     style="margin: 0 auto;
+            {% if card.color and not card.css_class %}
+              background-color: {{ card.color }};
+            {% endif %} 
+            border-radius: var(--border-radius); 
+            {% if card.color %}
+              box-shadow: 0 3px 8px {{ card.color }}80;
+            {% endif %}" 
+     data-card-id="{{ card.id }}"
+     {% if card.css_class %}
+        data-css-class="{{ card.css_class }}"
+     {% endif %}
+     >
+
+
+  <div class="card-modal__header">
+    <div class="card-modal__header-child">
+
+      <div class="card-modal__header-child-two">
+        <h3 class="card-title" id="cardTitleDisplay" data-card-id="{{ card.id }}">
+          {{ card.title }}
+        </h3>
+
+        {% if card.priority > 0 %}
+        <span class="priority-badge"
+              data-priority-level="{% if card.priority <= 3 %}low{% elif card.priority <= 7 %}medium{% else %}high{% endif %}">
+          {{ card.priority }}
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="ai-button-and-dropdown">
+
+        <button id="openAIChatBtn" class="cardmodal__ai-button" data-card-id="{{ card.id }}">
+          <i class="bi bi-robot me-2"></i>AI Chat
+        </button>
+
+        <div class="dropdown">
+          <button class="dropdown-button" 
+                  title="More options" 
+                  id="cardOptionsDropdown" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false">
+            <i class="bi bi-three-dots" style="font-size: 1.1rem;"></i>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOptionsDropdown">
+            <li class="dropdown priority-dropdown-toggle">
+
+              <div class="priority-dropdown">
+                <div class="priority-selector px-2 py-1" data-card-id="{{ card.id }}">
+
+                  <header class="priority-header">
+                    <i class="bi bi-flag-fill me-2"></i>Set Priority
+                  </header>
+
+                  <div class="btn-group btn-group-sm w-100" role="group" aria-label="Priority selection">
+                    {% for i in "123456789a"|make_list %}
+                    <button type="button"
+                            class="btn btn-sm priority-btn {% if card.priority == forloop.counter %}active{% endif %}"
+                            data-value="{{ forloop.counter }}"
+                            data-priority-level="{% if forloop.counter <= 3 %}low{% elif forloop.counter <= 7 %}medium{% else %}high{% endif %}">{{ forloop.counter }}</button>
+                    {% endfor %}
+                  </div>
+
+                </div>
+              </div>
+            </li>
+
+            <li>
+              <button class="dropdown-item toggle-description-section" type="button">
+                <i class="bi bi-file-text me-2"></i>
+                {% if card.description %}Edit
+                {% else %}Add
+                {% endif %} Description
+              </button>
+            </li>
+
+            <li>
+              <button class="dropdown-item" type="button" id="addSubtaskBtn" data-card-id="{{ card.id }}">
+                <i class="bi bi-list-check me-2"></i>Add Subtask
+              </button>
+            </li>
+
+            <li>
+              <button class="dropdown-item" type="button" id="uploadAttachmentBtn" data-card-id="{{ card.id }}">
+                <i class="bi bi-paperclip me-2"></i>Add File
+              </button>
+            </li>
+
+            <li>
+              <button class="dropdown-item" type="button" id="changeCardColorBtn" data-card-id="{{ card.id }}">
+                <i class="bi bi-palette me-2"></i>Change Card Color
+              </button>
+            </li>
+
+            <li>
+              <a href="{% url 'export_card_log_pdf' card_id=card.id %}" class="dropdown-item" id="exportCardLogBtn">
+                <i class="bi bi-file-pdf me-2"></i>Print Card to PDF
+              </a>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <button class="dropdown-item text-danger" type="button" id="dropdownDeleteCardBtn" data-card-id="{{ card.id }}">
+                <i class="bi bi-trash me-2"></i>Delete Card
+              </button>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+    <section class="card-desc {% if not card.description %}is-empty{% endif %}" 
+             data-card-id="{{ card.id }}"
+             id="card-desc">
+
+      <div class="card-desc__body">
+
+        <div id="cardDescription" class="card-desc__editable" data-card-id="{{ card.id }}" role="region">
+          {% if card.description %}
+            <p class="card-desc__text">
+              {{ card.description|linebreaksbr }}
+            </p>
+          {% else %}
+          <textarea id="descriptionTextarea" class="desc-editor__textarea" rows="1"></textarea>
+          {% endif %}
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+
+
+  <section class="subtasks-section d-none" id="subtasksSection">
+    <div class="subtasks-section__header">
+      <span><i class="bi bi-list-check me-2"></i>Subtasks</span>
+      <div class="d-flex align-items-center gap-2">
+        <span class="subtasks-count"></span>
+        <button class="subtask-quick-add-btn" id="subtaskQuickAddBtn" title="Add subtask">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </div>
+    </div>
+    <div class="subtask-area">
+      <div id="subtasksList" class="subtasks-list"></div>
+      <div class="mt-2 d-none" id="newSubtaskForm">
+        <div class="input-group">
+          <input type="text" class="form-control" id="newSubtaskInput" placeholder="Enter subtask name..." maxlength="255">
+          <button class="btn btn-primary" type="button" id="saveSubtaskBtn"><i class="bi bi-check"></i></button>
+          <button class="btn btn-secondary" type="button" id="cancelSubtaskBtn"><i class="bi bi-x"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="attachments-section d-none" id="attachmentsSection">
+    <div class="attachments-section__header">
+      <span><i class="bi bi-paperclip me-2"></i>Attachments</span>
+    </div>
+    <div id="attachmentsList" class="attachments-list"></div>
+  </section>
+
+
+  <div class="color-picker-section">    
+
+    <div class="color-picker-header">
+      <span>
+        <i class="bi bi-palette m-2"></i>
+        Change Card Color
+      </span>
+    </div>
+
+    <div class="color-picker-body">
+      
+      <div data-card-id="{{ card.id }}">
+        <div class="card-color-swatch m-1" data-color="rgb(240, 248, 255)" data-css-class="card-color-default" style="background-color: rgb(var(--card-color-default-rgb)); border: 2px solid var(--border);" title="Default"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(241, 11, 11)" data-css-class="card-color-red" style="background-color: rgb(var(--card-color-red-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(247, 103, 7)" data-css-class="card-color-orange" style="background-color: rgb(var(--card-color-orange-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(247, 243, 11)" data-css-class="card-color-yellow" style="background-color: rgb(var(--card-color-yellow-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(165, 231, 9)" data-css-class="card-color-light-green" style="background-color: rgb(var(--card-color-light-green-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(12, 133, 8)" data-css-class="card-color-dark-green" style="background-color: rgb(var(--card-color-dark-green-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(13, 160, 111)" data-css-class="card-color-teal" style="background-color: rgb(var(--card-color-teal-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(20, 197, 159)" data-css-class="card-color-cyan" style="background-color: rgb(var(--card-color-cyan-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(15, 41, 161)" data-css-class="card-color-blue" style="background-color: rgb(var(--card-color-blue-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(118, 11, 240)" data-css-class="card-color-purple" style="background-color: rgb(var(--card-color-purple-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(194, 8, 178)" data-css-class="card-color-magenta" style="background-color: rgb(var(--card-color-magenta-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(230, 20, 90)" data-css-class="card-color-pink" style="background-color: rgb(var(--card-color-pink-rgb));"></div>
+        <div class="card-color-swatch m-1" data-color="rgb(2, 9, 15)" data-css-class="card-color-dark" style="background-color: rgb(var(--card-color-dark-rgb));"></div>
+      </div>
+    </div>
+
+    <div class="color-picker-footer">
+      <button id="saveCardColorBtn" class="btn color-picker-save" data-card-id="{{ card.id }}">Save Color</button>
+      <button id="cancelCardColorBtn" class="btn color-picker-cancel">Cancel</button>
+    </div>
+
+  </div>
+  
+
+  <section class="cardmodal__logentries-container">
+    <header class="cardmodal__logentries-header">
+      <h2 class="log-entries-heading" id="log-entries-heading"><i class="bi bi-journal-text me-2"></i>Log Entries</h2>
+      <p class="log-counter"><span>{{ log_entries|length }}</span></p>
+    </header>
+
+    <footer class="cardmodal__logentry-footer">
+      <form class="cardmodal__logentry-footer-sub" 
+            id="logEntryForm" 
+            method="post" 
+            action="{% url 'card_detail' card_id=card.id %}">
+        {% csrf_token %}
+
+        <div class="cardmodal__logentry-text-enter">
+          <textarea id="logEntryTextarea" name="text" rows="1" placeholder="Add a new log entry..."></textarea>
+        </div>
+
+        <button class="cardmodal__logentry-footer-button" type="submit" title="Post Entry">
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </button>
+      </form>
+    </footer>
+
+
+    <ul class="cardmodal__logentries-main" id="logEntriesList">
+
+      {% for entry in log_entries %}
+      <li class="cardmodal__logentries-list" data-entry-id="{{ entry.id }}">
+        <article class="cardmodal__logentry" aria-labelledby="entry-{{ entry.id }}-title">
+
+          <header class="cardmodal__logentry-header">
+            <time datetime="{{ entry.created_at|date:'c' }}">{{ entry.created_at|date:"Y-m-d H:i" }}</time>
+            <div class="log-entry-actions">
+              <button type="button"
+                      class="edit-log-entry"
+                      data-entry-id="{{ entry.id }}"
+                      title="Edit this log entry"
+                      aria-label="Edit log entry from {{ entry.created_at|date:'Y-m-d H:i' }}">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+              </button>
+              <button type="button"
+                      class="delete-log-entry"
+                      data-entry-id="{{ entry.id }}"
+                      data-card-id="{{ card.id }}"
+                      title="Delete this log entry"
+                      aria-label="Delete log entry from {{ entry.created_at|date:'Y-m-d H:i' }}">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </header>
+
+          <div class="cardmodal__logentry-text" id="entry-{{ entry.id }}-title"><pre>{{ entry.text|escape }}</pre></div>
+
+        </article>
+      </li>
+      {% empty %}
+      <li class="cardmodal__logentries-list-empty">
+        <p>No log entries yet.</p>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </section>
+
+
+  <div class="modal kmodal"
+       id="attachmentModal" 
+       tabindex="-1" 
+       aria-labelledby="attachmentModalLabel" 
+       aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered kmodal__dialog">
+      <div class="modal-content kmodal__content">
+
+        <div class="modal-header kmodal__header">
+          <h5 class="modal-title kmodal__title" id="attachmentModalLabel">
+            <i class="bi bi-paperclip kmodal__title-icon"></i>Add Context Files
+          </h5>
+
+          <button type="button" 
+                  class="btn-close btn-close-white kmodal__close" 
+                  data-bs-dismiss="modal" 
+                  aria-label="Close">
+          </button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <form id="fileUploadForm">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="fileInput" class="form-label kmodal__label">Select files to upload</label>
+              <input class="form-control kmodal__input" type="file" id="fileInput" multiple>
+              <div class="form-text kmodal__help mt-2">
+                Supported formats: <strong>.txt, .pdf, .docx, .doc, .rtf, .csv</strong><br>
+                Maximum file size: <strong>10MB</strong> per file
+              </div>
+            </div>
+          </form>
+
+          <div id="uploadProgressContainer" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small kmodal__muted">Uploading files...</span>
+              <span class="small kmodal__muted" id="uploadProgressLabel"></span>
+            </div>
+            <div class="progress">
+              <div id="uploadProgressBar" class="progress-bar" role="progressbar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer kmodal__footer">
+          <button type="button" class="btn kmodal__btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary kmodal__btn kmodal__btn--primary" id="startUploadBtn" disabled>
+            <i class="bi bi-upload me-2"></i>Upload Files
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal kmodal" id="deleteAttachmentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-sm kmodal__dialog">
+      <div class="modal-content kmodal__content">
+
+        <div class="modal-header kmodal__header kmodal__header--danger">
+          <h5 class="modal-title kmodal__title" id="deleteAttachmentModalTitle">
+            <i class="bi bi-trash kmodal__title-icon"></i>Delete File
+          </h5>
+          <button type="button" class="btn-close kmodal__close" data-bs-dismiss="modal" aria-label="Close dialog"></button>
+        </div>
+
+        <div class="modal-body kmodal__body">
+          <p class="kmodal__muted mb-3" id="deleteAttachmentModalDesc">Are you sure you want to permanently delete this file?</p>
+
+          <figure id="fileToDelete" class="d-flex align-items-center mb-3" aria-label="File to delete">
+            <span class="me-3 flex-shrink-0" aria-hidden="true">
+              <i class="bi bi-file-earmark fs-5" aria-hidden="true"></i>
+            </span>
+            <figcaption class="flex-grow-1 min-w-0">
+              <div class="filename fw-medium" aria-live="polite" aria-atomic="true"></div>
+              <small class="kmodal__muted d-block">This action cannot be undone.</small>
+            </figcaption>
+          </figure>
+
+          <aside class="kmodal__help" role="alert" aria-live="assertive">
+            <div class="d-flex align-items-start">
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-5" aria-hidden="true"></i>
+              <div>
+                <strong class="d-block">Warning</strong>
+                <small>This file will be permanently deleted from the system.</small>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="modal-footer kmodal__footer">
+          <div class="d-flex gap-2 w-100">
+            <button type="button" class="btn kmodal__btn flex-fill" data-bs-dismiss="modal" aria-label="Cancel and close">
+              <i class="bi bi-x-circle me-1"></i>Cancel
+            </button>
+
+            <button type="button" 
+                    class="btn kmodal__btn kmodal__btn--danger flex-fill" 
+                    id="confirmDeleteBtn" 
+                    aria-label="Confirm delete file">
+              <i class="bi bi-trash me-1"></i>Delete
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="deleteCardModal" tabindex="-1" aria-labelledby="deleteCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content delete-card-modal">
+
+        <header class="delete-card-header">
+          <h5 class="delete-card-title" id="deleteCardModalLabel">
+            <span class="delete-card-icon" aria-hidden="true"><i class="bi bi-trash"></i></span>
+            <span>Delete Card</span>
+          </h5>
+          <button type="button" class="btn-close delete-card-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </header>
+
+        <div class="delete-card-body">
+          <p class="delete-card-text">
+            Are you sure you want to permanently delete this card?
+          </p>
+
+          <div class="delete-card-preview d-none" id="deleteCardPreview">
+            <div class="delete-card-preview-icon">
+              <i class="bi bi-kanban"></i>
+            </div>
+
+            <div class="delete-card-preview-text">
+              <div class="delete-card-preview-title text-truncate" id="deleteCardTitle"></div>
+              <small class="text-muted">This action will remove all content.</small>
+            </div>
+          </div>
+
+          <div class="delete-card-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Warning</strong><br>
+              <small>This card and all its data will be permanently deleted.</small>
+            </div>
+          </div>
+
+        </div>
+
+        <footer class="delete-card-footer">
+          <button type="button" 
+                  class="btn delete-card-cancel" 
+                  id="cancelDeleteCardBtn" 
+                  data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i>Cancel
+          </button>
+
+          <button type="button" 
+                  class="btn delete-card-confirm" 
+                  id="confirmDeleteCardBtn">
+            <i class="bi bi-trash me-1"></i>Delete
+          </button>
+        </footer>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="ai-chat-panel" id="ai-chat-panel" data-always-open="{% if ai_chat_always_open %}1{% else %}0{% endif %}">
+    <div class="ai-chat-resize-handle" title="Drag to resize"></div>
+    <div class="ai-chat-container">
+
+        <div class="ai-chat-header">
+            <div class="ai-chat-header__left">
+                <h5><i class="bi bi-robot me-2"></i>AI Assistant</h5>
+                <span class="ai-model-tag" title="{{ ai_model_display }}">{{ ai_model_display }}</span>
+            </div>
+            <div>
+                <button type="button" id="view-chat-history" title="Chat History"><i class="bi bi-clock-history"></i></button>
+                <button type="button" id="new-chat-session" title="New Chat"><i class="bi bi-plus-circle"></i></button>
+                <button type="button" id="close-ai-chat"><i class="bi bi-x"></i></button>
+            </div>
+        </div>
+
+        <div class="ai-chat-body" id="ai-chat-body">
+            <div class="ai-chat-messages" id="ai-chat-messages">
+                <div id="loading-spinner">
+                    <div role="status"><span>Loading...</span></div>
+                    <p>Loading chat history...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-sessions-view d-none" id="ai-sessions-view">
+            <div class="ai-sessions-header">
+                <button type="button" id="back-to-chat"><i class="bi bi-arrow-left me-1"></i>Back</button>
+                <span>Chat History</span>
+            </div>
+            <div class="ai-sessions-list" id="ai-sessions-list">
+                <div class="ai-sessions-loading">Loading sessions...</div>
+            </div>
+        </div>
+
+        <form id="ai-chat-form" class="ai-chat-form">
+          {% csrf_token %}
+          <div id="ai-file-popup" class="ai-file-popup d-none">
+            <div class="ai-file-popup__header">Attach file context</div>
+            <div class="ai-file-popup__list" id="ai-file-popup-list"></div>
+          </div>
+          <div class="ai-chat-form__controls">
+            <button type="button" id="ai-attach-toggle" title="Attach files as context" aria-pressed="false">
+              <i class="bi bi-paperclip"></i>
+              <span class="ai-attach-badge d-none" id="ai-attach-badge">0</span>
+            </button>
+            {% if ai_web_search %}
+            <button type="button" id="ai-web-search-toggle" title="Toggle web search" aria-pressed="false">
+              <i class="bi bi-globe2"></i>
+            </button>
+            {% endif %}
+            <textarea id="ai-chat-input" name="message" class="ai-chat-input form-control" rows="1" placeholder="Ask a question..." autocomplete="off"></textarea>
+            <button type="submit" id="ai-chat-submit">
+              <i class="bi bi-send"></i>
+            </button>
+          </div>
+        </form>
+
+    </div>
+  </div>
+
+</div>
+
+

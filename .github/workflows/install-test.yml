@@ -1,0 +1,57 @@
+name: Install test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  start-script:
+    name: start script (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            start: ./start.sh
+          - os: macos-latest
+            start: ./start.sh
+          - os: windows-latest
+            start: cmd //c start.bat
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start KanPlan
+        run: echo y | ${{ matrix.start }} > server.log 2>&1 &
+
+      - name: Wait for the server
+        run: |
+          for _ in $(seq 1 90); do
+            if curl -sf -o /dev/null http://localhost:8000/login/; then
+              echo "KanPlan is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "KanPlan did not respond within 3 minutes."
+          exit 1
+
+      - name: Check first-run setup
+        run: |
+          test -f .env
+          test -f db.sqlite3
+          test -f .secret_key
+
+      - name: Server log
+        if: always()
+        run: cat server.log

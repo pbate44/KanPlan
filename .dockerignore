@@ -1,0 +1,15 @@
+.git
+.github
+.vscode
+.venv
+.pytest_cache
+**/__pycache__
+.env
+.env.*
+!.env.example
+.secret_key
+*.sqlite3
+data
+media
+staticfiles
+tests
