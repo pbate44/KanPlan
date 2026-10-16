@@ -3,6 +3,8 @@ function setupLogFormSubmission() {
   var $form = $("#logEntryForm");
   if (!$form.length) return;
 
+  renderLogEntries();
+
   var textarea = $form.find("#logEntryTextarea, #id_text").get(0);
 
   function autoSize(el) {
@@ -73,7 +75,7 @@ function setupLogFormSubmission() {
           '<i class="bi bi-trash" aria-hidden="true"></i></button>' +
           '</div>' +
           '</header>' +
-          '<div class="cardmodal__logentry-text" id="entry-' + entry.id + '-title"><pre></pre></div>' +
+          '<div class="cardmodal__logentry-text" id="entry-' + entry.id + '-title"></div>' +
           '</article></li>';
 
         var $logEntriesList = $("#logEntriesList");
@@ -83,7 +85,7 @@ function setupLogFormSubmission() {
         }
 
         $logEntriesList.prepend(html);
-        $logEntriesList.find('[data-entry-id="' + entry.id + '"] pre').text(entry.text);
+        renderLogEntryText($logEntriesList.find('[data-entry-id="' + entry.id + '"] .cardmodal__logentry-text'), entry.text);
 
         $form.get(0).reset();
         autoSize(textarea);
@@ -149,7 +151,7 @@ $(document).on("click", ".edit-log-entry", function () {
 
   if ($textDiv.hasClass("is-editing")) return;
 
-  var originalText = $textDiv.find("pre").text();
+  var originalText = $textDiv.data("raw") || "";
   $textDiv.data("original-text", originalText);
 
   $textDiv.addClass("is-editing");
@@ -198,8 +200,7 @@ $(document).on("click", ".save-log-entry", function () {
 
 function cancelEdit($textDiv, originalText) {
   $textDiv.removeClass("is-editing");
-  $textDiv.html("<pre></pre>");
-  $textDiv.find("pre").text(originalText);
+  renderLogEntryText($textDiv, originalText);
 }
 
 function saveEdit(entryId, $textDiv, newText, originalText) {
