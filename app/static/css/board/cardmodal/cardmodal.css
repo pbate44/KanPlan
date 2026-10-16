@@ -939,6 +939,69 @@ h3.card-title {
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .07);
 }
 
+.log-format-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .15rem;
+  padding: .1rem .25rem 0;
+}
+.log-format-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--faint);
+  border-radius: var(--radius-sm);
+  min-width: 24px;
+  height: 22px;
+  padding: 0 .3rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: color .15s, background .15s, border-color .15s;
+}
+.log-format-btn:hover,
+.log-format-btn:focus-visible {
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), .1);
+  outline: none;
+}
+.log-format-btn--size {
+  font-family: var(--font-head);
+  font-size: .78rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.log-format-btn--size sup {
+  font-size: .65em;
+  top: -.5em;
+}
+.log-format-sep {
+  width: 1px;
+  height: 14px;
+  margin: 0 .25rem;
+  background: var(--border);
+}
+
+.log-md__p {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.log-md__list {
+  margin: .1rem 0;
+  padding-left: 1.2rem;
+}
+.log-md__list li { word-break: break-word; }
+.log-md__big   { font-size: 1.25em; }
+.log-md__small { font-size: .85em; }
+.log-md code {
+  font-size: .9em;
+  padding: .05rem .3rem;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--ink-rgb), .07);
+  color: var(--text);
+}
+
 .cardmodal__logentry-text-enter {
   flex: 1;
   min-width: 0;
