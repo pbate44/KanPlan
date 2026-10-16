@@ -1,9 +1,4 @@
 
-// Log entries are stored as plain text with markdown-style markers:
-//   **bold**  *italic*  __underline__  ~~strike~~  `code`
-//   [big]larger[/big]  [small]smaller[/small]  "- " bullet lines
-// The text is HTML-escaped before any markers are turned into tags.
-
 var LOG_INLINE_RULES = [
   [/\*\*\*(?=\S)(.*?\S)\*\*\*/g, "<strong><em>$1</em></strong>"],
   [/\*\*(?=\S)(.*?\S)\*\*/g,     "<strong>$1</strong>"],
@@ -31,7 +26,6 @@ function renderLogInline(line) {
     line = line.replace(rule[0], rule[1]);
   });
 
-  // Replace innermost size tags first so nested sizes compound.
   for (var i = 0; i < 10; i++) {
     var next = line.replace(LOG_SIZE_TAG, '<span class="log-md__$1">$2</span>');
     if (next === line) break;
@@ -72,7 +66,6 @@ function renderLogMarkdown(text) {
   return '<div class="log-md">' + out.join("") + "</div>";
 }
 
-// Renders `raw` into an entry's text container and keeps the raw text for editing.
 function renderLogEntryText($textDiv, raw) {
   $textDiv.data("raw", raw).html(renderLogMarkdown(raw));
 }
@@ -86,12 +79,9 @@ function renderLogEntries() {
 }
 
 
-// ── Formatting toolbar ────────────────────────────────────────────────────
-
 var LOG_TEXTAREAS = "#logEntryTextarea, .log-entry-edit-textarea";
 var _lastLogTextarea = null;
 
-// Replaces [start, end) with `text` in a way that keeps native undo working.
 function replaceLogRange(ta, start, end, text) {
   ta.focus();
   ta.setSelectionRange(start, end);
@@ -101,8 +91,6 @@ function replaceLogRange(ta, start, end, text) {
   }
 }
 
-// For single-character markers ("*"), a run of 2 is bold rather than italic,
-// so the marker only counts as present when the run length is odd.
 function hasMarkerRun(run, marker) {
   if (run.length < marker.length) return false;
   return marker.length === 1 ? run.length % 2 === 1 : true;
@@ -138,8 +126,6 @@ function isWrappedInside(sel, open, close) {
   return sel.indexOf(open) === 0 && sel.slice(-close.length) === close;
 }
 
-// Wraps each line of the selection separately so bullets and line breaks
-// stay outside the markers.
 function wrapLines(sel, open, close) {
   return sel.split("\n").map(function (line) {
     var m = /^(\s*(?:[-*] +)?)(.*?)(\s*)$/.exec(line);
@@ -186,7 +172,6 @@ function toggleWrap(ta, open, close) {
   if (!unwrapSelection(ta, open, close)) wrapSelection(ta, open, close);
 }
 
-// A+ first removes a [small] wrapper before adding [big], and A- the reverse.
 function changeSize(ta, grow) {
   var add    = grow ? "big" : "small";
   var remove = grow ? "small" : "big";
@@ -232,7 +217,6 @@ $(document).on("focusin", LOG_TEXTAREAS, function () {
   _lastLogTextarea = this;
 });
 
-// mousedown is cancelled so the textarea keeps focus and its selection.
 $(document).on("mousedown", ".log-format-btn", function (e) {
   e.preventDefault();
 });
